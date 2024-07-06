@@ -21,6 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={noto_sans.className}>
         <SessionProvider>
+          <Navbar />
           <main className="p-4 m-auto min-w-[300px]">{children}</main>
           <Footer />
         </SessionProvider>
