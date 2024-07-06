@@ -3,6 +3,7 @@ import { Noto_Sans } from "next/font/google";
 import "./globals.css";
 import SessionProvider from "@/app/components/SessionProvider";
 import Navbar from "./components/Navbar/Navbar";
+import Footer from "./components/Footer";
 
 const noto_sans = Noto_Sans({ subsets: ["latin"] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({
       <body className={noto_sans.className}>
         <SessionProvider>
           <main className="p-4 m-auto min-w-[300px]">{children}</main>
+          <Footer />
         </SessionProvider>
       </body>
     </html>

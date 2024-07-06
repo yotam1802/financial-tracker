@@ -1,9 +1,10 @@
 import hero from "@/app/assets/hero-image.png";
 import Link from "next/link";
+import FeatureCard from "./components/FeatureCard";
 
 export default function Home() {
   return (
-    <div className="flex bg-gray-50 px-20 items-center justify-center">
+    <div className="flex px-20 items-center justify-center">
       <div className="flex flex-col">
         <div className="w-full flex justify-center">
           <div
@@ -22,7 +23,10 @@ export default function Home() {
                   Track your purchases and analyze your spending
                 </h1>
                 <p className="mb-5">No payment required. Free forever.</p>
-                <Link className="btn btn-primary" href={"/api/sign-up"}>
+                <Link
+                  className="btn btn-primary text-white"
+                  href={"/api/sign-up"}
+                >
                   Get Started
                 </Link>
               </div>
@@ -40,14 +44,61 @@ export default function Home() {
           </p>
         </div>
 
-        {/* <div className="grid grid-cols-6 m-auto gap-x-32 mt-5">
-          <p>a</p>
-          <p>b</p>
-          <p>c</p>
-          <p>d</p>
-          <p>e</p>
-          <p>f</p>
-        </div> */}
+        <div className="w-full grid m-auto gap-x-5 gap-y-5 mt-5 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 justify-items-center items-center">
+          <FeatureCard
+            title={"Completely Free."}
+            description={
+              "Enjoy all of our features and benefits without any cost. No hidden fees, no subscriptions."
+            }
+          />
+          <FeatureCard
+            title={"Instant tracking"}
+            description={"Add a purchase in seconds with our simple interface."}
+          />
+          <FeatureCard
+            title={"Automatic categorization"}
+            description={
+              "We'll automatically categorize your purchases, but you can edit them if you want."
+            }
+          />
+          <FeatureCard
+            title={"Custom categories"}
+            description={
+              "Create custom categories so you can track exactly what you want."
+            }
+          />
+          <FeatureCard
+            title={"Spending analysis"}
+            description={
+              "Get insights into your spending habits and find aeas where you could save."
+            }
+          />
+          <FeatureCard
+            title={"Privacy first"}
+            description={"We don't sell or share your data. Ever."}
+          />
+        </div>
+
+        <div className="flex flex-col justify-end gap-6 px-4 py-10 @[480px]:gap-8 @[480px]:px-10 @[480px]:py-20 mt-24">
+          <div className="flex flex-col gap-2 text-center">
+            <h1 className="text-[#111418] font-bold tracking-tight text-3xl leading-tight sm:text-4xl sm:font-black sm:tracking-[-0.033em] max-w-[720px]">
+              Ready to take control of your spending?
+            </h1>
+            <p className="text-[#111418] font-normal text-base leading-normal max-w-[720px]">
+              Sign up today and start making smarter financial decisions.
+            </p>
+          </div>
+          <div className="flex flex-1 justify-center">
+            <div className="flex justify-center">
+              <Link
+                className="btn btn-primary text-white font-extrabold rounded-full w-80 h-16"
+                href={"/api/sign-up"}
+              >
+                Get started for free
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
