@@ -4,7 +4,6 @@ import { Session } from "next-auth";
 import Image from "next/image";
 import profilePicPlaceholder from "@/assets/profile-pic-placeholder.png";
 import { signIn, signOut } from "next-auth/react";
-import Link from "next/link";
 
 interface UserMenuButtonProps {
   session: Session | null;
@@ -40,7 +39,9 @@ export default function UserMenuButton({ session }: UserMenuButtonProps) {
       ) : (
         <button
           onClick={() =>
-            signIn(undefined, { callbackUrl: "http://localhost:3000/dashboard" })
+            signIn(undefined, {
+              callbackUrl: "http://localhost:3000/dashboard",
+            })
           }
           className="btn btn-primary text-white w-28 rounded-full"
         >

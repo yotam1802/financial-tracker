@@ -25,7 +25,7 @@ export default function Home() {
                 <p className="mb-5">No payment required. Free forever.</p>
                 <Link
                   className="btn btn-primary text-white"
-                  href={"/api/sign-up"}
+                  href={"/api/auth/signin"}
                 >
                   Get Started
                 </Link>
@@ -92,7 +92,7 @@ export default function Home() {
             <div className="flex justify-center">
               <Link
                 className="btn btn-primary text-white font-extrabold rounded-full w-80 h-16"
-                href={"/api/sign-up"}
+                href={"/api/auth/signin"}
               >
                 Get started for free
               </Link>
