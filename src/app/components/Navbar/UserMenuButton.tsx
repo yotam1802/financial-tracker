@@ -39,7 +39,9 @@ export default function UserMenuButton({ session }: UserMenuButtonProps) {
         </div>
       ) : (
         <button
-          onClick={() => signIn()}
+          onClick={() =>
+            signIn(undefined, { callbackUrl: "http://localhost:3000/dashboard" })
+          }
           className="btn btn-primary text-white w-28 rounded-full"
         >
           Sign in
