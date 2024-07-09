@@ -1,10 +1,15 @@
 import Link from "next/link";
 import logo from "@/assets/polaris-logo.png";
 import Image from "next/image";
+import UserMenuButton from "./UserMenuButton";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export default async function Navbar() {
+  const session = await getServerSession(authOptions);
+
   return (
-    <div className="bg-base-100">
+    <div className="bg-base-100 pt-1">
       <div className="navbar max-w-7xl mx-auto flex-col sm:flex-row gap-x-2">
         <div className="flex-1">
           <Link
@@ -16,8 +21,8 @@ export default async function Navbar() {
           </Link>
         </div>
         <div className="flex-none gap-2">
-          <div>Sign up</div>
-          <div>Sign in</div>
+          {/* <Link href="" className="btn btn-primary text-white w-24 rounded-full">Sign in</Link> */}
+          <UserMenuButton session={session} />
         </div>
       </div>
       <div className="flex w-full flex-col">
