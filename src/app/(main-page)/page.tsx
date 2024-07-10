@@ -1,6 +1,5 @@
-import hero from "@/app/assets/hero-image.png";
 import Link from "next/link";
-import FeatureCard from "./components/FeatureCard";
+import FeatureCard from "../components/FeatureCard";
 
 export default function Home() {
   return (

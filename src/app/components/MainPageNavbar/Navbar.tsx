@@ -21,7 +21,6 @@ export default async function Navbar() {
           </Link>
         </div>
         <div className="flex-none gap-2">
-          {/* <Link href="" className="btn btn-primary text-white w-24 rounded-full">Sign in</Link> */}
           <UserMenuButton session={session} />
         </div>
       </div>
