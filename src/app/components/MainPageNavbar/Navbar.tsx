@@ -9,7 +9,7 @@ export default async function Navbar() {
   const session = await getServerSession(authOptions);
 
   return (
-    <div className="bg-base-100 pt-1">
+    <div className="bg-base-100">
       <div className="navbar max-w-7xl mx-auto flex-col sm:flex-row gap-x-2">
         <div className="flex-1">
           <Link

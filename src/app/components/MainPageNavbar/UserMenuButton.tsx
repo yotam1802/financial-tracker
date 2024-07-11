@@ -4,6 +4,7 @@ import { Session } from "next-auth";
 import Image from "next/image";
 import profilePicPlaceholder from "@/assets/profile-pic-placeholder.png";
 import { signIn, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface UserMenuButtonProps {
   session: Session | null;
@@ -11,6 +12,7 @@ interface UserMenuButtonProps {
 
 export default function UserMenuButton({ session }: UserMenuButtonProps) {
   const user = session?.user;
+  const router = useRouter();
 
   return (
     <div>
@@ -30,6 +32,9 @@ export default function UserMenuButton({ session }: UserMenuButtonProps) {
             className="dropdown-content menu rounded-box menu-md z-30 mt-3 w-52 p-2 shadow-lg bg-base-100 border border-neutral-300"
           >
             <li>
+              <button onClick={() => router.push("/dashboard")}>
+                Dashboard
+              </button>
               <button onClick={() => signOut({ callbackUrl: "/" })}>
                 Sign Out
               </button>
