@@ -26,7 +26,7 @@ export default async function Navbar() {
       </div>
       <div className="flex w-full flex-col">
         <div className="divider mt-0"></div>
-      </div>
+      </div> 
     </div>
   );
 }
