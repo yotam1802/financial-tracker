@@ -1,29 +1,27 @@
 "use client";
 
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, FormEvent } from "react";
+import CategoryCard from "./CategoryCard";
 
 type TransactionFormProps = {};
 
 type TransactionType = "income" | "expense";
-type CategoryType = "default" | "food" | "transport" | "entertainment";
 
 export default function TransactionForm() {
   const [transactionType, setTransactionType] =
     useState<TransactionType>("expense");
-  const [category, setCategory] = useState<CategoryType>("default");
+  const [category, setCategory] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
 
-  const handleTypeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setTransactionType(event.target.value as TransactionType);
-  };
-
-  const handleCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setCategory(event.target.value as CategoryType);
-  };
-
-  const handleAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setAmount(event.target.value);
-  };
+  const categories = [
+    { name: "Food", icon: "🍔", color: "green" },
+    { name: "Transport", icon: "🚊", color: "sky" },
+    { name: "Entertainment", icon: "🎭", color: "orange" },
+    { name: "Travel", icon: "🚀", color: "amber" },
+    { name: "Bills", icon: "💵", color: "lime" },
+    { name: "Work", icon: "💼", color: "stone" },
+    { name: "Investments", icon: "📈", color: "gray" },
+  ];
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -73,10 +71,12 @@ export default function TransactionForm() {
     </svg>
   );
 
+  const color = categories.find(c => c.name === category) ? categories.find(c => c.name === category)?.color : "bg-primary-content"
+
   return (
     <form
       onSubmit={handleSubmit}
-      className={`rounded-xl w-full shadow-xl text-white max-w-4xl ${category === "food" ? "bg-green-500" : category === "transport" ? "bg-blue-500" : category === "entertainment" ? "bg-orange-500" : "bg-primary-content"}`}
+      className={`rounded-xl w-full shadow-xl text-white max-w-4xl bg-${color}-500`}
     >
       <div className="mb-4 w-full">
         <div className="join w-full bg-slate-400">
@@ -103,23 +103,67 @@ export default function TransactionForm() {
           </label>
         </div>
       </div>
-      <div className="mb-4 flex w-full mx-5 gap-5">
-        <div>
+      <div className="mb-4 flex w-full items-center justify-between flex-wrap px-10 gap-x-10 gap-y-1">
+        <div className="flex-grow-0">
           <label className="block">
-            <select
-              value={category}
-              className="select select-bordered select-lg h-20 bg-black text-5xl focus:outline-none"
-              onChange={handleCategoryChange}
+            <button
+              className="btn h-14 w-16 text-3xl bg-gray-800 border-gray-800 hover:bg-gray-800 hover:border-gray-800"
+              onClick={() =>
+                (
+                  document.getElementById("categoryModal") as HTMLDialogElement
+                ).showModal()
+              }
             >
-              <option value="default"></option>
-              <option value="food">🍔</option>
-              <option value="transport">🚊</option>
-              <option value="entertainment" title="Entertainment">🎭</option>
-              {/* Add more categories as needed */}
-            </select>
+                {categories.find(c => c.name === category)?.icon}
+            </button>
+            <dialog id="categoryModal" className="modal">
+              <div className="modal-box w-5/6 max-w-4xl text-black flex flex-col gap-5">
+                <h3 className="font-bold text-2xl">Categories</h3>
+                <div className="flex flex-row flex-wrap gap-6">
+                  {categories.map((category, key) => (
+                    <CategoryCard
+                      icon={category.icon}
+                      text={category.name}
+                      color={category.color}
+                      key={key}
+                      onClick={() => {
+                        setCategory(category.name)
+                        return (document.getElementById("categoryModal") as HTMLDialogElement).close()
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="modal-action">
+                  <div>
+                    <button
+                      className="btn"
+                      onClick={() =>
+                        (
+                          document.getElementById(
+                            "categoryModal",
+                          ) as HTMLDialogElement
+                        ).close()
+                      }
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </dialog>
           </label>
         </div>
-        <div className="">b</div>
+        <div className="w-full max-w-3xl flex-1">
+          <label className="input input-bordered flex items-center text-black lg:input-lg lg:w-full lg:max-w-2xl">
+            <span className="mr-2 text-xl font-semibold">$</span>
+            <input type="text" className="grow min-w-0" placeholder="Amount" />
+            <span
+              className={`badge badge-lg font-semibold border-gray-600 bg-${color}-300`}
+            >
+              CAD
+            </span>
+          </label>
+        </div>
       </div>
     </form>
   );
