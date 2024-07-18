@@ -120,14 +120,15 @@ export default function TransactionForm() {
               <div className="modal-box w-5/6 max-w-4xl text-black flex flex-col gap-5">
                 <h3 className="font-bold text-2xl">Categories</h3>
                 <div className="flex flex-row flex-wrap gap-6">
-                  {categories.map((category, key) => (
+                  {categories.map((c, key) => (
                     <CategoryCard
-                      icon={category.icon}
-                      text={category.name}
-                      color={category.color}
+                      icon={c.icon}
+                      text={c.name}
+                      color={c.color}
+                      active={c.name === category}
                       key={key}
                       onClick={() => {
-                        setCategory(category.name)
+                        setCategory(c.name)
                         return (document.getElementById("categoryModal") as HTMLDialogElement).close()
                       }}
                     />
