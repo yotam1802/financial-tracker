@@ -103,7 +103,7 @@ export default function TransactionForm() {
           </label>
         </div>
       </div>
-      <div className="mb-4 flex w-full items-center justify-between flex-wrap px-10 gap-x-10 gap-y-1">
+      <div className="mb-4 flex w-full items-center justify-between flex-wrap px-10 gap-x-10 gap-y-2">
         <div className="flex-grow-0">
           <label className="block">
             <button
@@ -158,7 +158,7 @@ export default function TransactionForm() {
             <span className="mr-2 text-xl font-semibold">$</span>
             <input type="text" className="grow min-w-0" placeholder="Amount" />
             <span
-              className={`badge badge-lg font-semibold border-gray-600 bg-${color}-300`}
+              className={`badge badge-lg font-semibold border-gray-600 bg-${color}-300 invisible md:visible`}
             >
               CAD
             </span>
