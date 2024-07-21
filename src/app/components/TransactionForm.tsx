@@ -1,27 +1,71 @@
 "use client";
 
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import CategoryCard from "./CategoryCard";
 
 type TransactionFormProps = {};
 
 type TransactionType = "income" | "expense";
 
+type Category =
+  | "Food"
+  | "Transport"
+  | "Entertainment"
+  | "Travel"
+  | "Bills"
+  | "Work"
+  | "Investments"
+  | "default";
+
+type CategoryColors = {
+  [key in Category]: {
+    bgColor: string;
+    badgeColor: string;
+  };
+};
+
+type CategoryEmojis = {
+  [key in Category]: string;
+};
+
+const categoryColors: CategoryColors = {
+  Food: { bgColor: "bg-green-500", badgeColor: "bg-green-300" },
+  Transport: { bgColor: "bg-sky-500", badgeColor: "bg-sky-300" },
+  Entertainment: { bgColor: "bg-orange-500", badgeColor: "bg-orange-300" },
+  Travel: { bgColor: "bg-amber-500", badgeColor: "bg-amber-300" },
+  Bills: { bgColor: "bg-lime-500", badgeColor: "bg-lime-300" },
+  Work: { bgColor: "bg-stone-500", badgeColor: "bg-stone-300" },
+  Investments: { bgColor: "bg-gray-500", badgeColor: "bg-gray-300" },
+  default: { bgColor: "bg-primary-content", badgeColor: "bg-primary-content" },
+};
+
+const categories = [
+  { name: "Food", icon: "🍔" },
+  { name: "Transport", icon: "🚊" },
+  { name: "Entertainment", icon: "🎭" },
+  { name: "Travel", icon: "🚀" },
+  { name: "Bills", icon: "💵" },
+  { name: "Work", icon: "💼" },
+  { name: "Investments", icon: "📈" },
+];
+
 export default function TransactionForm() {
   const [transactionType, setTransactionType] =
     useState<TransactionType>("expense");
-  const [category, setCategory] = useState<string>("");
+  const [category, setCategory] = useState<Category>("default");
   const [amount, setAmount] = useState<string>("");
+  const [bgColor, setBgColor] = useState<string>(
+    categoryColors["default"].bgColor,
+  );
+  const [badgeColor, setBadgeColor] = useState<string>(
+    categoryColors["default"].badgeColor,
+  );
 
-  const categories = [
-    { name: "Food", icon: "🍔", color: "green" },
-    { name: "Transport", icon: "🚊", color: "sky" },
-    { name: "Entertainment", icon: "🎭", color: "orange" },
-    { name: "Travel", icon: "🚀", color: "amber" },
-    { name: "Bills", icon: "💵", color: "lime" },
-    { name: "Work", icon: "💼", color: "stone" },
-    { name: "Investments", icon: "📈", color: "gray" },
-  ];
+  useEffect(() => {
+    const colors = categoryColors[category] || categoryColors["default"];
+    setBgColor(colors.bgColor);
+    setBadgeColor(colors.badgeColor);
+  }, [category]);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -71,12 +115,10 @@ export default function TransactionForm() {
     </svg>
   );
 
-  const color = categories.find(c => c.name === category) ? categories.find(c => c.name === category)?.color : "bg-primary-content"
-
   return (
     <form
       onSubmit={handleSubmit}
-      className={`rounded-xl w-full shadow-xl text-white max-w-4xl bg-${color}-500`}
+      className={`rounded-xl w-full shadow-xl text-white max-w-4xl ${bgColor}`}
     >
       <div className="mb-4 w-full">
         <div className="join w-full bg-slate-400">
@@ -114,7 +156,7 @@ export default function TransactionForm() {
                 ).showModal()
               }
             >
-                {categories.find(c => c.name === category)?.icon}
+              {categories.find((c) => c.name === category)?.icon}
             </button>
             <dialog id="categoryModal" className="modal">
               <div className="modal-box w-5/6 max-w-4xl text-black flex flex-col gap-5">
@@ -124,12 +166,16 @@ export default function TransactionForm() {
                     <CategoryCard
                       icon={c.icon}
                       text={c.name}
-                      color={c.color}
+                      color={categoryColors[c.name as Category].bgColor}
                       active={c.name === category}
                       key={key}
                       onClick={() => {
-                        setCategory(c.name)
-                        return (document.getElementById("categoryModal") as HTMLDialogElement).close()
+                        setCategory(c.name as Category);
+                        return (
+                          document.getElementById(
+                            "categoryModal",
+                          ) as HTMLDialogElement
+                        ).close();
                       }}
                     />
                   ))}
@@ -159,7 +205,7 @@ export default function TransactionForm() {
             <span className="mr-2 text-xl font-semibold">$</span>
             <input type="text" className="grow min-w-0" placeholder="Amount" />
             <span
-              className={`badge badge-lg font-semibold border-gray-600 bg-${color}-300 invisible md:visible`}
+              className={`badge badge-lg font-semibold border-gray-600 ${badgeColor} hidden md:inline-flex`}
             >
               CAD
             </span>
