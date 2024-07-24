@@ -286,6 +286,7 @@ export default function TransactionPage() {
                     placeholder="Amount"
                     value={amount}
                     onChange={handleAmountChange}
+                    required
                   />
                   <span
                     className={`badge badge-lg font-semibold border-gray-600 ${badgeColor} hidden md:inline-flex`}
@@ -306,6 +307,7 @@ export default function TransactionPage() {
                 placeholder="Walmart"
                 value={title}
                 onChange={handleTitleChange}
+                required
               />
             </label>
             <label className="input input-bordered flex items-center gap-2 lg:w-1/2">
@@ -318,6 +320,7 @@ export default function TransactionPage() {
                 max={`${new Date().getFullYear() + 4}-12-31`}
                 value={date}
                 onChange={handleDateChange}
+                required
               />
             </label>
           </div>
@@ -328,6 +331,7 @@ export default function TransactionPage() {
               placeholder="Description"
               value={description}
               onChange={handleDescriptionChange}
+              required
             ></textarea>
             <button
               type="submit"
