@@ -2,6 +2,7 @@
 
 import React, { useState, FormEvent, useEffect } from "react";
 import CategoryCard from "@/app/components/CategoryCard";
+import { getReceiptDetails } from "./actions";
 
 type TransactionType = "income" | "expense";
 
@@ -89,7 +90,11 @@ export default function TransactionPage() {
   const [transactionType, setTransactionType] =
     useState<TransactionType>("expense");
   const [category, setCategory] = useState<Category>("default");
-  const [amount, setAmount] = useState<string>(0);
+  const [amount, setAmount] = useState<string>("0");
+  const [title, setTitle] = useState<string>("");
+  const [date, setDate] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [receipt, setReceipt] = useState<string>("");
   const [bgColor, setBgColor] = useState<string>(
     categoryColors["default"].bgColor,
   );
@@ -103,7 +108,7 @@ export default function TransactionPage() {
     setBadgeColor(colors.badgeColor);
   }, [category]);
 
-  const handleSubmit = (event: FormEvent) => {
+  const addTransaction = (event: FormEvent) => {
     event.preventDefault();
     // Add logic to handle the form submission
     console.log({ transactionType, category, amount });
@@ -111,20 +116,80 @@ export default function TransactionPage() {
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    if (/^\d*\.?\d{0,2}$/.test(value)) {
+    if (/^(0|[1-9]\d*)?(\.\d{0,2})?$/.test(value)) {
       setAmount(value);
     }
   };
 
+  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    if (value.length > 30) {
+      return;
+    }
+    setTitle(value);
+  };
+
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setDate(value);
+  };
+
+  const handleDescriptionChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    const value = event.target.value;
+    if (value.length > 150) {
+      return;
+    }
+    setDescription(value);
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files === null) {
+      return;
+    }
+
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        console.log(reader.result); // Testing
+        setReceipt(reader.result);
+      }
+
+      reader.onerror = (error) => {
+        console.log("Error: " + error); // For Debugging
+      };
+    };
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (receipt === "") {
+      return;
+    }
+
+    const receiptDetails = await getReceiptDetails(receipt);
+    console.log(receiptDetails); // debugging
+
+    setAmount(receiptDetails.amount);
+    setTitle(receiptDetails.name);
+    setDate(receiptDetails.date); // Need to fix
+    setDescription(`Purchase from ${receiptDetails.name}.`);
+  };
+
   return (
-    <div className="flex w-full flex-col items-center min-h-full mb-10 lg:my-20">
-      <div className="rounded-box shadow-lg m-10 p-10 w-4/5 flex flex-col gap-5">
+    <div className="flex w-full flex-col items-center">
+      <div className="rounded-box shadow-lg p-10 w-4/5 flex flex-col gap-5 mb-20 md:my-10 xl:mt-20 xl:mb-10">
         <h1 className="text-2xl font-extrabold">Add New Transaction</h1>
         <div className="flex w-full flex-col">
           <div className="divider my-0"></div>
         </div>
 
-        <form onSubmit={handleSubmit} className={"flex flex-col gap-7"}>
+        <form onSubmit={addTransaction} className={"flex flex-col gap-7"}>
           <div
             className={`rounded-xl w-full shadow-xl text-white max-w-4xl ${bgColor}`}
           >
@@ -138,6 +203,7 @@ export default function TransactionPage() {
                     type="radio"
                     name="transactionType"
                     value="Expense"
+                    onClick={() => setTransactionType("expense")}
                     defaultChecked
                   />
                 </label>
@@ -149,6 +215,7 @@ export default function TransactionPage() {
                     type="radio"
                     name="transactionType"
                     value="Income"
+                    onClick={() => setTransactionType("income")}
                   />
                 </label>
               </div>
@@ -233,11 +300,25 @@ export default function TransactionPage() {
           <div className="flex flex-col lg:flex-row gap-x-20 gap-y-5">
             <label className="input input-bordered flex items-center gap-2 lg:w-1/2">
               <span className="font-semibold">Title</span>
-              <input type="text" className="grow" placeholder="Walmart" />
+              <input
+                type="text"
+                className="grow"
+                placeholder="Walmart"
+                value={title}
+                onChange={handleTitleChange}
+              />
             </label>
-            <label className="input input-bordered flex items-center gap-2 lg:w-2/5">
+            <label className="input input-bordered flex items-center gap-2 lg:w-1/2">
               <span className="font-semibold">Date</span>
-              <input type="date" className="grow" placeholder="Select date" />
+              <input
+                type="date"
+                className="grow"
+                placeholder="Select date"
+                min={"2024-01-01"}
+                max={`${new Date().getFullYear() + 4}-12-31`}
+                value={date}
+                onChange={handleDateChange}
+              />
             </label>
           </div>
 
@@ -245,12 +326,33 @@ export default function TransactionPage() {
             <textarea
               className="textarea textarea-bordered"
               placeholder="Description"
+              value={description}
+              onChange={handleDescriptionChange}
             ></textarea>
             <button
               type="submit"
               className="btn w-full btn-primary text-white font-bold"
             >
               Finish
+            </button>
+          </div>
+        </form>
+        <form className="mt-5 lg:mt-10 flex flex-col" onSubmit={handleSubmit}>
+          <h4 className="text-xl font-bold">Scan Receipt</h4>
+          <div className="flex w-full flex-col my-1">
+            <div className="divider my-0"></div>
+          </div>
+          <div className="flex flex-col gap-5 items-start lg:flex-row lg:justify-start">
+            <input
+              type="file"
+              className="file-input file-input-primary file-input-bordered w-full file-input-sm max-w-full lg:max-w-xs lg:file-input-md"
+              onChange={(e) => handleFileChange(e)}
+            />
+            <button
+              className="btn btn-primary text-white btn-sm md:btn-md md:btn-wide"
+              type="submit"
+            >
+              Analyze Receipt
             </button>
           </div>
         </form>
