@@ -335,7 +335,7 @@ export default function TransactionPage() {
             ></textarea>
             <button
               type="submit"
-              className="btn w-full btn-primary text-white font-bold"
+              className="btn w-32 md:btn-wide lg:w-96 btn-primary text-white font-bold mx-auto"
             >
               Finish
             </button>
