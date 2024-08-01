@@ -17,7 +17,7 @@ export default function FeatureCard({ title, description }: FeatureCardProps) {
   );
 
   return (
-    <div className="card bg-base-100 w-72 h-60 lg:h-72 lg:w-56 shadow-xl border border-gray-300">
+    <div className="card w-72 h-60 lg:h-72 lg:w-56 shadow-xl border border-gray-300 bg-base-200">
       <div className="card-body">
         <h2 className="card-title">{checkmarkSVG}</h2>
         <h2 className="card-title">{title}</h2>

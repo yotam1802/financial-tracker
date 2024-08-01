@@ -2,7 +2,7 @@
 
 import React, { useState, FormEvent, useEffect } from "react";
 import CategoryCard from "@/app/components/CategoryCard";
-import { getReceiptDetails } from "./actions";
+import { getReceiptDetails, addTransaction } from "./actions";
 
 type TransactionType = "income" | "expense";
 
@@ -14,7 +14,7 @@ type Category =
   | "Bills"
   | "Work"
   | "Investments"
-  | "default";
+  | "general";
 
 type CategoryColors = {
   [key in Category]: {
@@ -31,7 +31,7 @@ const categoryColors: CategoryColors = {
   Bills: { bgColor: "bg-lime-500", badgeColor: "bg-lime-300" },
   Work: { bgColor: "bg-stone-500", badgeColor: "bg-stone-300" },
   Investments: { bgColor: "bg-gray-500", badgeColor: "bg-gray-300" },
-  default: { bgColor: "bg-primary-content", badgeColor: "bg-primary-content" },
+  general: { bgColor: "bg-primary-content", badgeColor: "bg-primary-content" },
 };
 
 const categories = [
@@ -89,29 +89,28 @@ c-0.059,0.109-0.127,0.253-0.184,0.426C-0.15,19.251,0.011,20.28,0.561,20.971z"
 export default function TransactionPage() {
   const [transactionType, setTransactionType] =
     useState<TransactionType>("expense");
-  const [category, setCategory] = useState<Category>("default");
+  const [category, setCategory] = useState<Category>("general");
   const [amount, setAmount] = useState<string>("0");
   const [title, setTitle] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [receipt, setReceipt] = useState<string>("");
   const [bgColor, setBgColor] = useState<string>(
-    categoryColors["default"].bgColor,
+    categoryColors["general"].bgColor,
   );
   const [badgeColor, setBadgeColor] = useState<string>(
-    categoryColors["default"].badgeColor,
+    categoryColors["general"].badgeColor,
   );
 
   useEffect(() => {
-    const colors = categoryColors[category] || categoryColors["default"];
+    const colors = categoryColors[category] || categoryColors["general"];
     setBgColor(colors.bgColor);
     setBadgeColor(colors.badgeColor);
   }, [category]);
 
-  const addTransaction = (event: FormEvent) => {
+  const submitTransaction = async (event: FormEvent) => {
     event.preventDefault();
-    // Add logic to handle the form submission
-    console.log({ transactionType, category, amount });
+    await addTransaction(transactionType, category, amount, title, date, description)
   };
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,7 +164,7 @@ export default function TransactionPage() {
     };
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const analyzeReceipt = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (receipt === "") {
@@ -178,18 +177,18 @@ export default function TransactionPage() {
     setAmount(receiptDetails.amount);
     setTitle(receiptDetails.name);
     setDate(receiptDetails.date); // Need to fix
-    setDescription(`Purchase from ${receiptDetails.name}.`);
+    setDescription(receiptDetails.description);
   };
 
   return (
     <div className="flex w-full flex-col items-center">
-      <div className="rounded-box shadow-lg p-10 w-4/5 flex flex-col gap-5 mb-20 md:my-10 xl:mt-20 xl:mb-10">
+      <div className="rounded-box shadow-lg p-10 w-4/5 flex flex-col gap-5 mb-20 md:my-10 xl:mt-20 xl:mb-10 bg-gray-50">
         <h1 className="text-2xl font-extrabold">Add New Transaction</h1>
         <div className="flex w-full flex-col">
           <div className="divider my-0"></div>
         </div>
 
-        <form onSubmit={addTransaction} className={"flex flex-col gap-7"}>
+        <form onSubmit={submitTransaction} className={"flex flex-col gap-7"}>
           <div
             className={`rounded-xl w-full shadow-xl text-white max-w-4xl ${bgColor}`}
           >
@@ -341,7 +340,7 @@ export default function TransactionPage() {
             </button>
           </div>
         </form>
-        <form className="mt-5 lg:mt-10 flex flex-col" onSubmit={handleSubmit}>
+        <form className="mt-5 lg:mt-10 flex flex-col" onSubmit={analyzeReceipt}>
           <h4 className="text-xl font-bold">Scan Receipt</h4>
           <div className="flex w-full flex-col my-1">
             <div className="divider my-0"></div>

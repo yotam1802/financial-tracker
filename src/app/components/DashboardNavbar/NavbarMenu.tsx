@@ -131,7 +131,7 @@ export default function NavbarMenu() {
         <Link
           href={"/transactions"}
           data-tip="Transactions"
-          className={`tooltip lg:tooltip-right flex flex-col lg:flex-row ${isActive("/transactions") ? "active" : ""} px-1 md:px-5 w-14 md:w-28 lg:w-full`}
+          className={`tooltip lg:tooltip-right flex flex-col lg:flex-row ${isActive("/transactions") || isActive("/transactions/add-transaction") ? "active" : ""} px-1 md:px-5 w-14 md:w-28 lg:w-full`}
         >
           {banknoteIcon}
           <span className="invisible md:visible">Transactions</span>
