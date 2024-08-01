@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, FormEvent, useEffect } from "react";
+import React, { useState, FormEvent, useEffect, useTransition } from "react";
 import CategoryCard from "@/app/components/CategoryCard";
 import { getReceiptDetails, addTransaction } from "./actions";
 
@@ -87,6 +87,8 @@ c-0.059,0.109-0.127,0.253-0.184,0.426C-0.15,19.251,0.011,20.28,0.561,20.971z"
 );
 
 export default function TransactionPage() {
+  const [isPending, startTransition] = useTransition();
+
   const [transactionType, setTransactionType] =
     useState<TransactionType>("expense");
   const [category, setCategory] = useState<Category>("general");
@@ -96,10 +98,10 @@ export default function TransactionPage() {
   const [description, setDescription] = useState<string>("");
   const [receipt, setReceipt] = useState<string>("");
   const [bgColor, setBgColor] = useState<string>(
-    categoryColors["general"].bgColor,
+    categoryColors["general"].bgColor
   );
   const [badgeColor, setBadgeColor] = useState<string>(
-    categoryColors["general"].badgeColor,
+    categoryColors["general"].badgeColor
   );
 
   useEffect(() => {
@@ -108,13 +110,9 @@ export default function TransactionPage() {
     setBadgeColor(colors.badgeColor);
   }, [category]);
 
-  const submitTransaction = async (event: FormEvent) => {
-    event.preventDefault();
-    await addTransaction(transactionType, category, amount, title, date, description)
-  };
-
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
+
     if (/^(0|[1-9]\d*)?(\.\d{0,2})?$/.test(value)) {
       setAmount(value);
     }
@@ -134,7 +132,7 @@ export default function TransactionPage() {
   };
 
   const handleDescriptionChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     const value = event.target.value;
     if (value.length > 150) {
@@ -171,18 +169,36 @@ export default function TransactionPage() {
       return;
     }
 
-    const receiptDetails = await getReceiptDetails(receipt);
-    console.log(receiptDetails); // debugging
+    startTransition(async () => {
+      const receiptDetails = await getReceiptDetails(receipt);
 
-    setAmount(receiptDetails.amount);
-    setTitle(receiptDetails.name);
-    setDate(receiptDetails.date); // Need to fix
-    setDescription(receiptDetails.description);
+      setAmount(receiptDetails.amount);
+      setTitle(receiptDetails.name);
+      setDate(receiptDetails.date); // Need to fix
+      setDescription(receiptDetails.description);
+    });
+  };
+
+  const submitTransaction = async (event: FormEvent) => {
+    event.preventDefault();
+
+    startTransition(async () => {
+      await addTransaction(
+        transactionType,
+        category,
+        amount,
+        title,
+        date,
+        description
+      );
+    });
   };
 
   return (
     <div className="flex w-full flex-col items-center">
-      <div className="rounded-box shadow-lg p-10 w-4/5 flex flex-col gap-5 mb-20 md:my-10 xl:mt-20 xl:mb-10 bg-gray-50">
+      <div
+        className={`shadow-lg p-10 w-full flex flex-col gap-5 mb-10 md:w-4/5 md:rounded-box md:my-10 xl:mt-20 xl:mb-10 bg-gray-50 transition-opacity ease-in-out duration-700 ${isPending ? "opacity-60" : ""}`}
+      >
         <h1 className="text-2xl font-extrabold">Add New Transaction</h1>
         <div className="flex w-full flex-col">
           <div className="divider my-0"></div>
@@ -204,6 +220,7 @@ export default function TransactionPage() {
                     value="Expense"
                     onClick={() => setTransactionType("expense")}
                     defaultChecked
+                    disabled={isPending}
                   />
                 </label>
                 <label className="label cursor-pointer flex-1 p-0 join-item btn rounded-b-none justify-center opacity-40 has-[:checked]:opacity-100 font-bold">
@@ -215,6 +232,7 @@ export default function TransactionPage() {
                     name="transactionType"
                     value="Income"
                     onClick={() => setTransactionType("income")}
+                    disabled={isPending}
                   />
                 </label>
               </div>
@@ -223,11 +241,13 @@ export default function TransactionPage() {
               <div className="flex-grow-0">
                 <label className="block">
                   <button
-                    className="btn h-14 w-16 text-3xl bg-gray-800 border-gray-800 hover:bg-gray-800 hover:border-gray-800"
+                    type="button"
+                    className="btn h-14 w-16 text-3xl bg-gray-800 border-gray-800 hover:bg-gray-800 hover:border-gray-800 disabled:cursor-none disabled:bg-opacity-100 disabled:text-black disabled:bg-gray-800 disabled:hover:bg-gray-800 disabled:hover:text-black"
+                    disabled={isPending}
                     onClick={() =>
                       (
                         document.getElementById(
-                          "categoryModal",
+                          "categoryModal"
                         ) as HTMLDialogElement
                       ).showModal()
                     }
@@ -249,7 +269,7 @@ export default function TransactionPage() {
                               setCategory(c.name as Category);
                               return (
                                 document.getElementById(
-                                  "categoryModal",
+                                  "categoryModal"
                                 ) as HTMLDialogElement
                               ).close();
                             }}
@@ -259,11 +279,12 @@ export default function TransactionPage() {
                       <div className="modal-action">
                         <div>
                           <button
+                            type="button"
                             className="btn"
                             onClick={() =>
                               (
                                 document.getElementById(
-                                  "categoryModal",
+                                  "categoryModal"
                                 ) as HTMLDialogElement
                               ).close()
                             }
@@ -286,6 +307,7 @@ export default function TransactionPage() {
                     value={amount}
                     onChange={handleAmountChange}
                     required
+                    disabled={isPending}
                   />
                   <span
                     className={`badge badge-lg font-semibold border-gray-600 ${badgeColor} hidden md:inline-flex`}
@@ -302,39 +324,43 @@ export default function TransactionPage() {
               <span className="font-semibold">Title</span>
               <input
                 type="text"
-                className="grow"
+                className="grow overflow-hidden"
                 placeholder="Walmart"
                 value={title}
                 onChange={handleTitleChange}
                 required
+                disabled={isPending}
               />
             </label>
             <label className="input input-bordered flex items-center gap-2 lg:w-1/2">
               <span className="font-semibold">Date</span>
               <input
                 type="date"
-                className="grow"
+                className="grow overflow-hidden"
                 placeholder="Select date"
                 min={"2024-01-01"}
                 max={`${new Date().getFullYear() + 4}-12-31`}
                 value={date}
                 onChange={handleDateChange}
                 required
+                disabled={isPending}
               />
             </label>
           </div>
 
           <div className="flex flex-col gap-10">
             <textarea
-              className="textarea textarea-bordered"
+              className="textarea textarea-bordered overflow-hidden"
               placeholder="Description"
               value={description}
               onChange={handleDescriptionChange}
               required
+              disabled={isPending}
             ></textarea>
             <button
               type="submit"
               className="btn w-32 md:btn-wide lg:w-96 btn-primary text-white font-bold mx-auto"
+              disabled={isPending}
             >
               Finish
             </button>
@@ -350,16 +376,21 @@ export default function TransactionPage() {
               type="file"
               className="file-input file-input-primary file-input-bordered w-full file-input-sm max-w-full lg:max-w-xs lg:file-input-md"
               onChange={(e) => handleFileChange(e)}
+              disabled={isPending}
             />
             <button
-              className="btn btn-primary text-white btn-sm md:btn-md md:btn-wide"
+              className="btn btn-primary text-white btn-sm w-36 md:btn-wide lg:btn-md"
               type="submit"
+              disabled={isPending}
             >
-              Analyze Receipt
+              Scan
             </button>
           </div>
         </form>
       </div>
+      {isPending && (
+        <span className="loading loading-dots w-24 lg:w-32 fixed flex items-center justify-center h-full"></span>
+      )}
     </div>
   );
 }
