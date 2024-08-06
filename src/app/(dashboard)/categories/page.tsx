@@ -9,7 +9,7 @@ export default function CategoriesPage() {
         <div className="flex flex-col gap-y-3 gap-x-5 md:flex-row md:justify-between md:items-end">
           <h1 className="text-2xl font-extrabold">Categories</h1>
           <Link
-            href={"/transactions/add-transaction"}
+            href={"/categories/add-category"}
             className="btn btn-primary text-white btn-circle w-52"
           >
             Add Category
