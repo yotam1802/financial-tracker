@@ -23,6 +23,7 @@ export default function CategoriesPage() {
           modal.close();
         }
       }, 0);
+
     setIcon(emoji.emoji);
     return setTimeout(() => {
       const modal = document.getElementById("iconModal") as HTMLDialogElement;
@@ -43,10 +44,10 @@ export default function CategoriesPage() {
         </div>
 
         <div className="flex-grow-0">
-          <label className="block">
+          <label>
             <button
               type="button"
-              className="btn h-20 w-24 text-5xl bg-gray-800 border-gray-800 hover:bg-gray-800 hover:border-gray-800 disabled:cursor-none disabled:bg-opacity-100 disabled:text-black disabled:bg-gray-800 disabled:hover:bg-gray-800 disabled:hover:text-black"
+              className="btn h-20 w-24 text-5xl bg-primary-content border-gray-200 hover:bg-primary-content hover:border-gray-200 disabled:cursor-none disabled:bg-opacity-100 disabled:text-black disabled:bg-primary-content disabled:hover:bg-primary-content disabled:hover:text-black"
               disabled={isPending}
               onClick={() =>
                 (
