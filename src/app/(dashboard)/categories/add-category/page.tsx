@@ -131,7 +131,7 @@ export default function CategoriesPage() {
       onSubmit={submitCategory}
     >
       <div
-        className={`shadow-lg p-10 w-full flex flex-col gap-5 mb-10 md:w-4/5 md:rounded-box md:my-10 xl:mt-20 xl:mb-10 bg-gray-50 transition-opacity ease-in-out duration-700 ${isPending ? "opacity-60" : ""}`}
+        className={`shadow-lg p-10 w-full flex flex-col gap-5 gap-y-10 mb-10 pb-16 md:w-4/5 md:rounded-box md:my-10 xl:mt-20 xl:mb-10 bg-gray-50 transition-opacity ease-in-out duration-700 ${isPending ? "opacity-60" : ""}`}
       >
         <h1 className="text-2xl font-extrabold">Add New Category</h1>
         <div className="flex w-full flex-col">
@@ -161,7 +161,7 @@ export default function CategoriesPage() {
           <label>
             <button
               type="button"
-              className={`btn h-16 w-20 text-4xl md:h-20 md:w-24 md:text-5xl rounded-2xl ${color.bgColor} border-gray-200 hover:bg-gray-100 hover:border-gray-200 disabled:cursor-none disabled:bg-opacity-100 disabled:text-black disabled:bg-primary-content disabled:hover:bg-primary-content disabled:hover:text-black`}
+              className={`btn h-20 w-24 text-5xl rounded-2xl ${color.bgColor} border-gray-200 hover:bg-gray-100 hover:border-gray-200 disabled:cursor-none disabled:bg-opacity-100 disabled:text-black disabled:bg-primary-content disabled:hover:bg-primary-content disabled:hover:text-black`}
               disabled={isPending}
               onClick={() =>
                 (
@@ -240,7 +240,7 @@ export default function CategoriesPage() {
               type="text"
               value={name}
               placeholder="Name"
-              className="input input-bordered text-lg md:input-lg w-full md:h-20 md:text-3xl font-semibold"
+              className="input input-bordered text-xl input-lg w-full md:h-20 md:text-3xl font-semibold"
               required
               onChange={handleNameChange}
             />
@@ -252,7 +252,7 @@ export default function CategoriesPage() {
               return (
                 <button
                   key={key}
-                  className={`${color.bgColor} p-3 md:p-4 lg:p-5 rounded-full`}
+                  className={`${color.bgColor} p-4 lg:p-5 rounded-full`}
                   onClick={() => setColor(color)}
                   type="button"
                 >
@@ -275,7 +275,7 @@ export default function CategoriesPage() {
             return (
               <button
                 key={key}
-                className={`${color.bgColor} p-3 md:p-4 lg:p-5 rounded-full`}
+                className={`${color.bgColor} p-4 lg:p-5 rounded-full`}
                 onClick={() => setColor(color)}
                 type="button"
               >
