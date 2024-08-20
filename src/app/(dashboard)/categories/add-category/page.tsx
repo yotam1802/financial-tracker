@@ -245,6 +245,13 @@ export default function CategoriesPage() {
             );
           })}
         </div>
+        <button
+          type="submit"
+          className="btn w-full lg:w-2/5 btn-primary text-white font-bold mx-auto"
+          disabled={isPending}
+        >
+          Add Category
+        </button>
       </div>
     </div>
   );
