@@ -1,11 +1,13 @@
 "use client";
 
 import { Categories, EmojiClickData } from "emoji-picker-react";
-import { SetStateAction, useEffect, useState, useTransition } from "react";
+import { FormEvent, useState, useTransition } from "react";
+import { addCategory } from "./actions";
 import dynamic from "next/dynamic";
 
 export default function CategoriesPage() {
   const [icon, setIcon] = useState("");
+  const [name, setName] = useState("");
   const [color, setColor] = useState({
     bgColor: "bg-primary-content",
     badgeColor: "bg-primary-content",
@@ -83,7 +85,6 @@ export default function CategoriesPage() {
   );
 
   const handleIconChange = (emoji: EmojiClickData) => {
-    console.log(emoji);
     if (emoji.emoji == "🫐" || emoji.emoji == "🛝") {
       return setTimeout(() => {
         const modal = document.getElementById("iconModal") as HTMLDialogElement;
@@ -102,21 +103,65 @@ export default function CategoriesPage() {
     }, 0);
   };
 
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setName(value);
+  };
+
+  const submitCategory = async (event: FormEvent) => {
+    event.preventDefault();
+
+    if (!name || !icon || !color) return;
+
+    startTransition(async () => {
+      await addCategory(name, icon, color.bgColor, color.badgeColor);
+    });
+
+    setName("");
+    setIcon("");
+    setColor({
+      bgColor: "bg-primary-content",
+      badgeColor: "bg-primary-content",
+    });
+  };
+
   return (
-    <div className="flex w-full flex-col items-center">
+    <form
+      className="flex w-full flex-col items-center mb-5"
+      onSubmit={submitCategory}
+    >
       <div
-        className={`shadow-lg p-10 w-full flex flex-col gap-5 mb-10 md:w-4/5 md:rounded-box md:my-10 xl:mt-20 xl:mb-10 bg-gray-50`}
+        className={`shadow-lg p-10 w-full flex flex-col gap-5 mb-10 md:w-4/5 md:rounded-box md:my-10 xl:mt-20 xl:mb-10 bg-gray-50 transition-opacity ease-in-out duration-700 ${isPending ? "opacity-60" : ""}`}
       >
         <h1 className="text-2xl font-extrabold">Add New Category</h1>
         <div className="flex w-full flex-col">
           <div className="divider my-0"></div>
+        </div>
+        <div
+          role="alert"
+          className="alert alert-info bg-primary text-white font-semibold"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="h-6 w-6 shrink-0 stroke-current"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <span>Choose a category icon and name to add a category.</span>
         </div>
 
         <div className="flex flex-col md:flex-row gap-x-10 gap-y-4 flex-grow-0">
           <label>
             <button
               type="button"
-              className={`btn h-16 w-20 text-4xl md:h-20 md:w-24 md:text-5xl rounded-2xl ${color.bgColor} border-gray-200 hover:${color.badgeColor} hover:border-gray-200 disabled:cursor-none disabled:bg-opacity-100 disabled:text-black disabled:${color.bgColor} disabled:hover:${color.badgeColor} disabled:hover:text-black`}
+              className={`btn h-16 w-20 text-4xl md:h-20 md:w-24 md:text-5xl rounded-2xl ${color.bgColor} border-gray-200 hover:bg-gray-100 hover:border-gray-200 disabled:cursor-none disabled:bg-opacity-100 disabled:text-black disabled:bg-primary-content disabled:hover:bg-primary-content disabled:hover:text-black`}
               disabled={isPending}
               onClick={() =>
                 (
@@ -193,8 +238,11 @@ export default function CategoriesPage() {
           <div className="flex w-full">
             <input
               type="text"
+              value={name}
               placeholder="Name"
               className="input input-bordered text-lg md:input-lg w-full md:h-20 md:text-3xl font-semibold"
+              required
+              onChange={handleNameChange}
             />
           </div>
         </div>
@@ -206,6 +254,7 @@ export default function CategoriesPage() {
                   key={key}
                   className={`${color.bgColor} p-3 md:p-4 lg:p-5 rounded-full`}
                   onClick={() => setColor(color)}
+                  type="button"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -228,6 +277,7 @@ export default function CategoriesPage() {
                 key={key}
                 className={`${color.bgColor} p-3 md:p-4 lg:p-5 rounded-full`}
                 onClick={() => setColor(color)}
+                type="button"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -253,6 +303,9 @@ export default function CategoriesPage() {
           Add Category
         </button>
       </div>
-    </div>
+      {isPending && (
+        <span className="loading loading-dots w-24 lg:w-32 fixed flex items-center justify-center h-full"></span>
+      )}
+    </form>
   );
 }

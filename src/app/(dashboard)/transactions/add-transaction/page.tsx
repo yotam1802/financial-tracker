@@ -88,7 +88,6 @@ c-0.059,0.109-0.127,0.253-0.184,0.426C-0.15,19.251,0.011,20.28,0.561,20.971z"
 
 export default function TransactionPage() {
   const [isPending, startTransition] = useTransition();
-
   const [transactionType, setTransactionType] =
     useState<TransactionType>("expense");
   const [category, setCategory] = useState<Category>("general");
