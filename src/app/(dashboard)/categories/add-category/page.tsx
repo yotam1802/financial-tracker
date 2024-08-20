@@ -139,7 +139,7 @@ export default function CategoriesPage() {
         </div>
         <div
           role="alert"
-          className="alert alert-info bg-primary text-white font-semibold"
+          className="alert alert-info bg-primary text-white md:font-semibold"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
