@@ -196,7 +196,7 @@ export default function TransactionPage() {
   return (
     <div className="flex w-full flex-col items-center">
       <div
-        className={`shadow-lg p-10 w-full flex flex-col gap-5 mb-10 md:w-4/5 md:rounded-box md:my-10 xl:mt-20 xl:mb-10 bg-gray-50 transition-opacity ease-in-out duration-700 ${isPending ? "opacity-60" : ""}`}
+        className={`shadow-lg p-10 w-full flex flex-col gap-5 mb-10 md:w-4/5 md:rounded-box md:my-10 xl:mt-20 xl:mb-10 bg-gray-100 transition-opacity ease-in-out duration-700 ${isPending ? "opacity-60" : ""}`}
       >
         <h1 className="text-2xl font-extrabold">Add New Transaction</h1>
         <div className="flex w-full flex-col">
