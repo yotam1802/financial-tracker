@@ -114,14 +114,16 @@ export default function CategoriesPage() {
     if (!name || !icon || !color) return;
 
     startTransition(async () => {
-      await addCategory(name, icon, color.bgColor, color.badgeColor);
-    });
-
-    setName("");
-    setIcon("");
-    setColor({
-      bgColor: "bg-primary-content",
-      badgeColor: "bg-primary-content",
+      try {
+        await addCategory(name, icon, color.bgColor, color.badgeColor);
+      } finally {
+        setName("");
+        setIcon("");
+        setColor({
+          bgColor: "bg-primary-content",
+          badgeColor: "bg-primary-content",
+        });
+      }
     });
   };
 

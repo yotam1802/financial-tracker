@@ -23,6 +23,15 @@ export async function addCategory(
     throw Error("Missing required fields");
   }
 
+  // Check if a category with the same name already exists
+  const existingCategory = await prisma.category.findFirst({
+    where: { name },
+  });
+
+  if (existingCategory) {
+    return;
+  }
+
   await prisma.category.create({
     data: {
       name,
