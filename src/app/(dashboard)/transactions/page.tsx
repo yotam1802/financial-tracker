@@ -18,7 +18,7 @@ export default function TransactionPage() {
 
   return (
     <div className="flex h-full w-full flex-col items-center">
-      <div className="rounded-box shadow-lg m-10 p-5 w-5/6 flex justify-center">
+      <div className="rounded-box shadow-lg m-10 p-5 w-5/6 flex justify-center bg-gray-100">
         <div className="flex flex-col gap-5 w-11/12">
           <div className="flex flex-col gap-y-3 gap-x-5 md:flex-row md:justify-between md:items-end">
             <h1 className="text-2xl font-extrabold">Transactions</h1>
