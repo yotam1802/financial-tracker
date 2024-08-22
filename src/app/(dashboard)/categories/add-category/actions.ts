@@ -25,7 +25,7 @@ export async function addCategory(
 
   // Check if a category with the same name already exists
   const existingCategory = await prisma.category.findFirst({
-    where: { name },
+    where: { name, userId: session.user.id },
   });
 
   if (existingCategory) {

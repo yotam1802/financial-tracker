@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { getCategories, removeCategory } from "./actions";
-import CategoryEntry from "@/app/components/CategoryEntry";
 import { startTransition, useEffect, useState } from "react";
 
 interface Category {
@@ -17,11 +16,14 @@ interface Category {
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchCategories = async () => {
+      setIsLoading(true);
       const categories = await getCategories();
       setCategories(categories);
+      setIsLoading(false);
     };
 
     fetchCategories();
@@ -30,7 +32,7 @@ export default function CategoriesPage() {
   return (
     <div className="flex w-full flex-col items-center">
       <div
-        className={`shadow-lg p-10 w-full flex flex-col gap-5 mb-10 md:w-4/5 md:rounded-box md:pb md:my-10 xl:mt-20 bg-gray-100`}
+        className={`shadow-lg p-10 w-full flex flex-col gap-5 mb-10 md:w-4/5 md:rounded-box md:pb md:my-10 xl:mt-20 bg-gray-100 transition-opacity ease-in-out duration-700 ${isLoading ? "opacity-60" : ""}`}
       >
         <div className="flex flex-col gap-y-3 gap-x-5 md:flex-row md:justify-between md:items-end">
           <h1 className="text-2xl font-extrabold">Categories</h1>
@@ -93,6 +95,9 @@ export default function CategoriesPage() {
           })}
         </div>
       </div>
+      {isLoading && (
+        <span className="loading loading-dots w-24 lg:w-32 fixed flex items-center justify-center h-full"></span>
+      )}
     </div>
   );
 }
