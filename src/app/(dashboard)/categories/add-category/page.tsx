@@ -6,6 +6,8 @@ import { addCategory } from "./actions";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 
+const Picker = dynamic(() => import("emoji-picker-react"), { ssr: false });
+
 export default function CategoriesPage() {
   const [icon, setIcon] = useState("");
   const [name, setName] = useState("");
@@ -77,13 +79,6 @@ export default function CategoriesPage() {
       badgeColor: "bg-red-300",
     },
   ];
-
-  const Picker = dynamic(
-    () => {
-      return import("emoji-picker-react");
-    },
-    { ssr: false }
-  );
 
   const handleIconChange = (emoji: EmojiClickData) => {
     if (emoji.emoji == "🫐" || emoji.emoji == "🛝") {
