@@ -4,6 +4,7 @@ import { Categories, EmojiClickData } from "emoji-picker-react";
 import { FormEvent, useState, useTransition } from "react";
 import { addCategory } from "./actions";
 import dynamic from "next/dynamic";
+import { redirect } from "next/navigation";
 
 export default function CategoriesPage() {
   const [icon, setIcon] = useState("");
@@ -117,12 +118,7 @@ export default function CategoriesPage() {
       try {
         await addCategory(name, icon, color.bgColor, color.badgeColor);
       } finally {
-        setName("");
-        setIcon("");
-        setColor({
-          bgColor: "bg-primary-content",
-          badgeColor: "bg-primary-content",
-        });
+        redirect("/categories");
       }
     });
   };
