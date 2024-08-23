@@ -11,7 +11,7 @@ model Transaction {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   transactionType String
   categoryId      String   @db.ObjectId
-  category        Category @relation(fields: [categoryId], references: [id])
+  category        Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   amount          String
   title           String
   date            String

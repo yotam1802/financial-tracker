@@ -26,8 +26,8 @@ export const authOptions: NextAuthOptions = {
         {
           name: "General",
           icon: "📦",
-          bgColor: "bg-primary-content",
-          badgeColor: "bg-primary-content",
+          bgColor: "bg-emerald-500",
+          badgeColor: "bg-emerald-300",
         },
         {
           name: "Food",
