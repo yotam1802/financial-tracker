@@ -4,7 +4,7 @@ import { Categories, EmojiClickData } from "emoji-picker-react";
 import { FormEvent, useState, useTransition } from "react";
 import { addCategory } from "./actions";
 import dynamic from "next/dynamic";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const Picker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
@@ -16,6 +16,7 @@ export default function CategoriesPage() {
     badgeColor: "bg-primary-content",
   });
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const colors = [
     {
@@ -113,7 +114,7 @@ export default function CategoriesPage() {
       try {
         await addCategory(name, icon, color.bgColor, color.badgeColor);
       } finally {
-        redirect("/categories");
+        router.push("/categories");
       }
     });
   };
