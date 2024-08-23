@@ -26,7 +26,7 @@ export default function CategoryCard({
       >
         {icon}
       </div>
-      <p className="text-sm font-mono">{text}</p>
+      <p className="text-sm font-semibold tracking-tight">{text}</p>
     </button>
   );
 }
