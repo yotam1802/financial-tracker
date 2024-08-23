@@ -2,47 +2,30 @@
 
 import React, { useState, FormEvent, useEffect, useTransition } from "react";
 import CategoryCard from "@/app/components/CategoryCard";
-import { getReceiptDetails, addTransaction } from "./actions";
+import { getReceiptDetails, addTransaction, getCategories } from "./actions";
 
 type TransactionType = "income" | "expense";
 
-type Category =
-  | "Food"
-  | "Transport"
-  | "Entertainment"
-  | "Travel"
-  | "Bills"
-  | "Work"
-  | "Investments"
-  | "general";
+// const categoryColors: CategoryColors = {
+//   Food: { bgColor: "bg-green-500", badgeColor: "bg-green-300" },
+//   Transport: { bgColor: "bg-sky-500", badgeColor: "bg-sky-300" },
+//   Entertainment: { bgColor: "bg-orange-500", badgeColor: "bg-orange-300" },
+//   Travel: { bgColor: "bg-amber-500", badgeColor: "bg-amber-300" },
+//   Bills: { bgColor: "bg-lime-500", badgeColor: "bg-lime-300" },
+//   Work: { bgColor: "bg-stone-500", badgeColor: "bg-stone-300" },
+//   Investments: { bgColor: "bg-gray-500", badgeColor: "bg-gray-300" },
+//   general: { bgColor: "bg-primary-content", badgeColor: "bg-primary-content" },
+// };
 
-type CategoryColors = {
-  [key in Category]: {
-    bgColor: string;
-    badgeColor: string;
-  };
-};
-
-const categoryColors: CategoryColors = {
-  Food: { bgColor: "bg-green-500", badgeColor: "bg-green-300" },
-  Transport: { bgColor: "bg-sky-500", badgeColor: "bg-sky-300" },
-  Entertainment: { bgColor: "bg-orange-500", badgeColor: "bg-orange-300" },
-  Travel: { bgColor: "bg-amber-500", badgeColor: "bg-amber-300" },
-  Bills: { bgColor: "bg-lime-500", badgeColor: "bg-lime-300" },
-  Work: { bgColor: "bg-stone-500", badgeColor: "bg-stone-300" },
-  Investments: { bgColor: "bg-gray-500", badgeColor: "bg-gray-300" },
-  general: { bgColor: "bg-primary-content", badgeColor: "bg-primary-content" },
-};
-
-const categories = [
-  { name: "Food", icon: "🍔", color: "green" },
-  { name: "Transport", icon: "🚊", color: "sky" },
-  { name: "Entertainment", icon: "🎭", color: "orange" },
-  { name: "Travel", icon: "🚀", color: "amber" },
-  { name: "Bills", icon: "💵", color: "lime" },
-  { name: "Work", icon: "💼", color: "stone" },
-  { name: "Investments", icon: "📈", color: "gray" },
-];
+// const categories = [
+//   { name: "Food", icon: "🍔", color: "green" },
+//   { name: "Transport", icon: "🚊", color: "sky" },
+//   { name: "Entertainment", icon: "🎭", color: "orange" },
+//   { name: "Travel", icon: "🚀", color: "amber" },
+//   { name: "Bills", icon: "💵", color: "lime" },
+//   { name: "Work", icon: "💼", color: "stone" },
+//   { name: "Investments", icon: "📈", color: "gray" },
+// ];
 
 const expenseArrow = (
   <svg
@@ -86,28 +69,42 @@ c-0.059,0.109-0.127,0.253-0.184,0.426C-0.15,19.251,0.011,20.28,0.561,20.971z"
   </svg>
 );
 
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  bgColor: string;
+  badgeColor: string;
+  userId?: string;
+}
+
 export default function TransactionPage() {
   const [isPending, startTransition] = useTransition();
   const [transactionType, setTransactionType] =
     useState<TransactionType>("expense");
-  const [category, setCategory] = useState<Category>("general");
+  const [categorySelected, setCategorySelected] = useState<Category>();
+  const [categories, setCategories] = useState<Category[]>([]);
   const [amount, setAmount] = useState<string>("0");
   const [title, setTitle] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [receipt, setReceipt] = useState<string>("");
-  const [bgColor, setBgColor] = useState<string>(
-    categoryColors["general"].bgColor
-  );
-  const [badgeColor, setBadgeColor] = useState<string>(
-    categoryColors["general"].badgeColor
-  );
+  const [bgColor, setBgColor] = useState<string>("bg-primary-content");
+  const [badgeColor, setBadgeColor] = useState<string>("bg-primary-content");
 
   useEffect(() => {
-    const colors = categoryColors[category] || categoryColors["general"];
-    setBgColor(colors.bgColor);
-    setBadgeColor(colors.badgeColor);
-  }, [category]);
+    startTransition(async () => {
+      const categories = await getCategories();
+      setCategories(categories);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (categorySelected) {
+      setBgColor(categorySelected.bgColor);
+      setBadgeColor(categorySelected.badgeColor);
+    }
+  }, [categorySelected]);
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -181,10 +178,14 @@ export default function TransactionPage() {
   const submitTransaction = async (event: FormEvent) => {
     event.preventDefault();
 
+    if (!categorySelected) {
+      return;
+    }
+
     startTransition(async () => {
       await addTransaction(
         transactionType,
-        category,
+        categorySelected,
         amount,
         title,
         date,
@@ -251,7 +252,7 @@ export default function TransactionPage() {
                       ).showModal()
                     }
                   >
-                    {categories.find((c) => c.name === category)?.icon}
+                    {categorySelected?.icon}
                   </button>
                   <dialog id="categoryModal" className="modal">
                     <div className="modal-box w-5/6 max-w-4xl text-black flex flex-col gap-5">
@@ -261,11 +262,11 @@ export default function TransactionPage() {
                           <CategoryCard
                             icon={c.icon}
                             text={c.name}
-                            color={categoryColors[c.name as Category].bgColor}
-                            active={c.name === category}
+                            color={c.bgColor}
+                            active={c == categorySelected}
                             key={key}
                             onClick={() => {
-                              setCategory(c.name as Category);
+                              setCategorySelected(c);
                               return (
                                 document.getElementById(
                                   "categoryModal"

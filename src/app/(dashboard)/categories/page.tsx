@@ -70,10 +70,12 @@ export default function CategoriesPage() {
                   className="text-white mr-5 lg:mr-10"
                   onClick={(e) => {
                     startTransition(async () => {
+                      setIsLoading(true);
                       await removeCategory(category.id);
                       setCategories((prevCategories) =>
                         prevCategories.filter((c) => c.id !== category.id)
                       );
+                      setIsLoading(false);
                     });
                   }}
                 >

@@ -9,6 +9,15 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  bgColor: string;
+  badgeColor: string;
+  userId?: string;
+}
+
 export async function getReceiptDetails(receipt: string) {
   "use server";
 
@@ -45,9 +54,35 @@ export async function getReceiptDetails(receipt: string) {
   return object;
 }
 
+export async function getCategories() {
+  "use server";
+
+  // Retrieve the session
+  const session = await getServerSession(authOptions);
+
+  // Redirect if the session is not found
+  if (!session) {
+    redirect("/api/auth/signin?callbackUrl=/categories/add-category");
+  }
+
+  // Fetch categories
+  const categories = await prisma.category.findMany({
+    where: { userId: session.user.id },
+  });
+
+  // Return the categories
+  return categories.map((category) => ({
+    id: category.id,
+    name: category.name,
+    icon: category.icon,
+    bgColor: category.bgColor,
+    badgeColor: category.badgeColor,
+  }));
+}
+
 export async function addTransaction(
   transactionType: string,
-  category: string,
+  categorySelected: Category,
   amount: string,
   title: string,
   date: string,
@@ -63,7 +98,7 @@ export async function addTransaction(
 
   if (
     !transactionType ||
-    !category ||
+    !categorySelected ||
     !amount ||
     !title ||
     !date ||
@@ -75,7 +110,7 @@ export async function addTransaction(
   await prisma.transaction.create({
     data: {
       transactionType,
-      category,
+      categoryId: categorySelected.id,
       amount,
       title,
       date,
