@@ -3,6 +3,7 @@
 import React, { useState, FormEvent, useEffect, useTransition } from "react";
 import CategoryCard from "@/app/components/CategoryCard";
 import { getReceiptDetails, addTransaction, getCategories } from "./actions";
+import { useRouter } from "next/navigation";
 
 type TransactionType = "income" | "expense";
 
@@ -91,6 +92,7 @@ export default function TransactionPage() {
   const [receipt, setReceipt] = useState<string>("");
   const [bgColor, setBgColor] = useState<string>("bg-primary-content");
   const [badgeColor, setBadgeColor] = useState<string>("bg-primary-content");
+  const router = useRouter();
 
   useEffect(() => {
     startTransition(async () => {
@@ -192,6 +194,7 @@ export default function TransactionPage() {
         description
       );
     });
+    router.push("/transactions");
   };
 
   return (
