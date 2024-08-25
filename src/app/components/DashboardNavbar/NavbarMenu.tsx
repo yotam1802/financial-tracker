@@ -161,7 +161,7 @@ export default function NavbarMenu() {
         <Link
           href={"/categories"}
           data-tip="Categories"
-          className={`tooltip lg:tooltip-right flex flex-col lg:flex-row ${isActive("/categories") ? "active" : ""} px-1 md:px-5 lg:px-2 w-14 md:w-28 lg:w-full`}
+          className={`tooltip lg:tooltip-right flex flex-col lg:flex-row ${isActive("/categories") || isActive("/categories/add-category") ? "active" : ""} px-1 md:px-5 lg:px-2 w-14 md:w-28 lg:w-full`}
         >
           {tagIcon}
           <span className="invisible md:visible">Categories</span>
