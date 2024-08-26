@@ -6,6 +6,7 @@ import { getTransactions, removeTransaction } from "./actions";
 import emptySVG from "../../../../public/empty.svg";
 import transactionSVG from "../../../../public/transaction.svg";
 import Image from "next/image";
+import * as XLSX from "xlsx";
 
 interface Category {
   id: string;
@@ -83,6 +84,35 @@ export default function TransactionPage() {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const exportToExcel = () => {
+    const formattedTransactions = transactions.map((transaction) => ({
+      Date: transaction.date,
+      Title: transaction.title,
+      Amount: transaction.amount,
+      Category: transaction.category.name,
+      Type: transaction.transactionType,
+      Description: transaction.description,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedTransactions);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+    const url = window.URL.createObjectURL(data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `Transactions_${year}_${month}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -252,6 +282,18 @@ export default function TransactionPage() {
               </div>
             )}
           </div>
+          {transactions.length !== 0 ? (
+            <button
+              className="btn btn-primary text-white w-44 md:btn-wide btn-md"
+              type="submit"
+              disabled={isPending}
+              onClick={exportToExcel}
+            >
+              Export Data to Excel
+            </button>
+          ) : (
+            ""
+          )}
         </div>
       </div>
       {isPending && (
