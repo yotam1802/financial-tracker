@@ -6,7 +6,7 @@ import { getTransactions, removeTransaction } from "./actions";
 import emptySVG from "../../../../public/empty.svg";
 import transactionSVG from "../../../../public/transaction.svg";
 import Image from "next/image";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 interface Category {
   id: string;
@@ -86,25 +86,70 @@ export default function TransactionPage() {
     });
   };
 
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
+    const maxDescriptionLength = 50;
+
     const formattedTransactions = transactions.map((transaction) => ({
       Date: transaction.date,
       Title: transaction.title,
-      Amount: transaction.amount,
+      Amount:
+        transaction.transactionType === "expense"
+          ? -Math.abs(parseFloat(transaction.amount)) // Negative for expenses
+          : Math.abs(parseFloat(transaction.amount)), // Positive for income
       Category: transaction.category.name,
       Type: transaction.transactionType,
-      Description: transaction.description,
+      Description:
+        transaction.description.length > maxDescriptionLength
+          ? transaction.description.substring(0, maxDescriptionLength) + "..."
+          : transaction.description,
     }));
 
-    const worksheet = XLSX.utils.json_to_sheet(formattedTransactions);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Transactions");
 
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
+    worksheet.columns = [
+      { header: "Date", key: "Date", width: 15 },
+      { header: "Title", key: "Title", width: 30 },
+      {
+        header: "Amount",
+        key: "Amount",
+        width: 18, // Increased width for more space
+        style: { numFmt: "[$$-409]#,##0.00;[Red]-[$$-409]#,##0.00" }, // Standard currency format
+      },
+      { header: "Category", key: "Category", width: 20 },
+      { header: "Type", key: "Type", width: 15 },
+      { header: "Description", key: "Description", width: 50 },
+    ];
+
+    // Bold the headers and center align
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
     });
-    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+    worksheet.addRows(formattedTransactions);
+
+    // Center align all cells in the worksheet
+    worksheet.eachRow((row) => {
+      row.eachCell((cell) => {
+        cell.alignment = { vertical: "middle", horizontal: "center" };
+      });
+    });
+
+    // Set column widths dynamically, except for Amount
+    worksheet.columns.forEach((column) => {
+      if (column.key !== "Amount" && column.eachCell) {
+        let maxLength = 0;
+        column.eachCell({ includeEmpty: true }, (cell) => {
+          const cellValue = cell.value ? cell.value.toString() : "";
+          maxLength = Math.max(maxLength, cellValue.length);
+        });
+        column.width = maxLength + 2; // Add some padding
+      }
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const data = new Blob([buffer], { type: "application/octet-stream" });
 
     const url = window.URL.createObjectURL(data);
     const link = document.createElement("a");
