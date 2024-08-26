@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { getTransactions } from "./actions";
+import Image from "next/image";
 
 interface Category {
   id: string;
@@ -143,9 +144,55 @@ export default function TransactionPage() {
                 <h3 className="text-xl font-bold tracking-wide my-3">
                   {formatDate(date)}
                 </h3>
-                <ul>
+                <ul className="bg-gray-100 p-4 rounded-lg">
                   {groupedTransactions[date].map((transaction) => (
-                    <li key={transaction.id}>{transaction.title}</li>
+                    <li
+                      key={transaction.id}
+                      className="flex justify-between items-center mb-4 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
+                      style={{
+                        backgroundColor: "#f9fafb", // Softer white background for a refined look
+                        borderLeft: `8px solid ${transaction.category.badgeColor}`,
+                      }}
+                    >
+                      <div className="flex items-center">
+                        <div
+                          className="text-3xl mr-4 flex items-center justify-center w-12 h-12 rounded-full"
+                          style={{
+                            backgroundColor: transaction.category.bgColor,
+                          }}
+                        >
+                          {transaction.category.icon}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-lg text-gray-900">
+                            {transaction.title}
+                          </h4>
+                          <p className="text-sm text-gray-500">
+                            {transaction.description}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {transaction.date}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p
+                          className={`text-lg font-bold ${
+                            transaction.transactionType === "income"
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {transaction.transactionType === "income" ? "+" : "-"}
+                          ${transaction.amount}
+                        </p>
+                        <span
+                          className={`mt-2 px-3 py-1 rounded-full text-xs font-medium ${transaction.category.badgeColor} text-gray-800`}
+                        >
+                          {transaction.category.name}
+                        </span>
+                      </div>
+                    </li>
                   ))}
                 </ul>
               </div>
