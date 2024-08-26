@@ -144,27 +144,24 @@ export default function TransactionPage() {
                 <h3 className="text-xl font-bold tracking-wide my-3">
                   {formatDate(date)}
                 </h3>
-                <ul className="bg-gray-100 p-4 rounded-lg">
+                <ul className="bg-gray-100 p-2 rounded-lg">
                   {groupedTransactions[date].map((transaction) => (
                     <li
                       key={transaction.id}
-                      className="flex justify-between items-center mb-4 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
-                      style={{
-                        backgroundColor: "#f9fafb", // Softer white background for a refined look
-                        borderLeft: `8px solid ${transaction.category.badgeColor}`,
-                      }}
+                      className={`flex flex-row shadow-lg justify-between gap-3 md:gap-10 md:items-center mb-4 p-2 md:p-4 rounded-lg transition-transform transform hover:scale-105 border-l-8 ${transaction.transactionType === "income" ? "border-green-500" : "border-red-500"}`}
                     >
-                      <div className="flex items-center">
+                      <div className="flex items-center mb-0 gap-x-2 md:gap-x-3">
                         <div
-                          className={`text-3xl mr-4 flex items-center justify-center w-12 h-12 rounded-full ${transaction.category.bgColor}`}
+                          className={`text-3xl flex items-center flex-shrink-0 justify-center w-12 h-12 rounded-full ${transaction.category.bgColor}`}
                         >
                           {transaction.category.icon}
                         </div>
-                        <div>
+
+                        <div className="mt-0 pt-0">
                           <h4 className="font-semibold text-lg text-gray-900">
                             {transaction.title}
                           </h4>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 max-w-full">
                             {transaction.description}
                           </p>
                           <p className="text-xs text-gray-400 mt-1">
@@ -172,7 +169,7 @@ export default function TransactionPage() {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-left mb-1 flex flex-col items-center justify-center">
                         <p
                           className={`text-lg font-bold ${
                             transaction.transactionType === "income"
