@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
-import { getTransactions } from "./actions";
+import { getTransactions, removeTransaction } from "./actions";
+import emptySVG from "../../../../public/empty.svg";
 import Image from "next/image";
 
 interface Category {
@@ -139,58 +140,92 @@ export default function TransactionPage() {
             </select>
           </div>
           <div className="my-10">
-            {sortedDates.map((date) => (
-              <div key={date}>
-                <h3 className="text-xl font-bold tracking-wide my-3">
-                  {formatDate(date)}
-                </h3>
-                <ul className="bg-gray-100 p-2 rounded-lg">
-                  {groupedTransactions[date].map((transaction) => (
-                    <li
-                      key={transaction.id}
-                      className={`flex flex-row shadow-lg justify-between gap-3 md:gap-10 md:items-center mb-4 p-2 md:p-4 rounded-lg transition-transform transform hover:scale-105 border-l-8 ${transaction.transactionType === "income" ? "border-green-500" : "border-red-500"}`}
-                    >
-                      <div className="flex items-center mb-0 gap-x-2 md:gap-x-3">
-                        <div
-                          className={`text-3xl flex items-center flex-shrink-0 justify-center w-12 h-12 rounded-full ${transaction.category.bgColor}`}
-                        >
-                          {transaction.category.icon}
-                        </div>
+            {transactions.length !== 0 ? (
+              sortedDates.map((date) => (
+                <div key={date}>
+                  <h3 className="text-xl font-bold tracking-wide my-3">
+                    {formatDate(date)}
+                  </h3>
+                  <ul className="bg-gray-100 p-2 rounded-lg flex flex-col gap-3">
+                    {groupedTransactions[date].map((transaction) => (
+                      <li
+                        key={transaction.id}
+                        className={`flex flex-row shadow-lg justify-between gap-3 md:gap-10 md:items-center p-2 md:p-4 rounded-lg transition-transform transform hover:scale-105 border-l-8 ${transaction.transactionType === "income" ? "border-green-500" : "border-red-500"}`}
+                      >
+                        <div className="flex items-center mb-0 gap-x-3 md:gap-x-4">
+                          <div className="flex flex-col justify-center items-center gap-y-1">
+                            <div
+                              className={`text-3xl flex items-center flex-shrink-0 justify-center w-12 h-12 rounded-full ${transaction.category.bgColor}`}
+                            >
+                              {transaction.category.icon}
+                            </div>
+                            <button
+                              className="btn btn-xs bg-red-600 text-white hover:bg-red-500"
+                              onClick={(e) => {
+                                startTransition(async () => {
+                                  removeTransaction(transaction.id);
+                                });
+                                setTransactions(
+                                  transactions.filter(
+                                    (t) => t.id !== transaction.id
+                                  )
+                                );
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
 
-                        <div className="mt-0 pt-0">
-                          <h4 className="font-semibold text-lg text-gray-900">
-                            {transaction.title}
-                          </h4>
-                          <p className="text-sm text-gray-500 max-w-full">
-                            {transaction.description}
-                          </p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            {transaction.date}
-                          </p>
+                          <div className="mt-0 pt-0">
+                            <h4 className="font-semibold text-lg text-gray-900">
+                              {transaction.title}
+                            </h4>
+                            <p className="text-sm text-gray-500 max-w-full">
+                              {transaction.description}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {transaction.date}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="text-left mb-1 flex flex-col items-center justify-center">
-                        <p
-                          className={`text-lg font-bold ${
-                            transaction.transactionType === "income"
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {transaction.transactionType === "income" ? "+" : "-"}
-                          ${transaction.amount}
-                        </p>
-                        <span
-                          className={`mt-2 px-3 py-1 rounded-full text-xs font-semibold ${transaction.category.badgeColor} text-gray-800`}
-                        >
-                          {transaction.category.name}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                        <div className="text-left mb-1 flex flex-col items-center justify-center">
+                          <p
+                            className={`text-lg font-bold ${
+                              transaction.transactionType === "income"
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            {transaction.transactionType === "income"
+                              ? "+"
+                              : "-"}
+                            ${transaction.amount}
+                          </p>
+                          <span
+                            className={`mt-2 px-3 py-1 rounded-full text-xs font-semibold ${transaction.category.badgeColor} text-gray-800`}
+                          >
+                            {transaction.category.name}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-3">
+                <Image
+                  src={emptySVG}
+                  alt="No results"
+                  width={1000}
+                  height={1000}
+                  className="max-w-[13rem] md:max-w-[16rem]"
+                />
+                <p className="font-semibold text-xs md:text-sm">
+                  No transactions found for {months[Number(month)]}, {year}.
+                </p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
