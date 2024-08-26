@@ -1,7 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { getTransactions } from "./actions";
+
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  bgColor: string;
+  badgeColor: string;
+  userId?: string | null;
+}
+
+interface Transaction {
+  id: string;
+  transactionType: string;
+  categoryId: string;
+  category: Category;
+  amount: string;
+  title: string;
+  date: string;
+  description: string;
+  userId?: string | null;
+}
 
 export default function TransactionPage() {
   const months = [
@@ -20,14 +42,45 @@ export default function TransactionPage() {
   ];
 
   const [isPending, startTransition] = useTransition();
-  const [month, setMonth] = useState();
-  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState<string>("7");
+  const [year, setYear] = useState<string>(`${new Date().getFullYear()}`);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  useEffect(() => {
+    startTransition(async () => {
+      const transactions = await getTransactions(year, month);
+      setTransactions(transactions);
+    });
+  }, [month, year]);
 
   const currentYear = new Date().getFullYear();
   const yearsArray = Array.from(
     { length: 10 },
     (_, index) => currentYear - index
   );
+
+  const groupedTransactions = transactions.reduce(
+    (groups: Record<string, Transaction[]>, transaction) => {
+      const date = transaction.date;
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(transaction);
+      return groups;
+    },
+    {}
+  );
+
+  const sortedDates = Object.keys(groupedTransactions).sort();
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString + "T00:00:00");
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -51,11 +104,12 @@ export default function TransactionPage() {
             <div className="w-full">
               <input
                 type="range"
-                min={10}
-                max="120"
-                defaultValue={70}
+                min="1"
+                max="12"
+                value={month}
                 className="range range-primary"
-                step="10"
+                step="1"
+                onChange={(e) => setMonth(e.target.value)}
               />
               <div className="flex w-full justify-between px-2 text-xs">
                 <span>|</span>
@@ -72,14 +126,30 @@ export default function TransactionPage() {
                 <span>|</span>
               </div>
             </div>
-            <select className="select select-bordered font-semibold w-full max-w-xs">
-              <option disabled value={year}>
-                Select a year
-              </option>
+            <select
+              className="select select-bordered font-semibold w-full max-w-xs"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+            >
+              <option disabled>Select a year</option>
               {yearsArray.map((year, key) => (
                 <option key={key}>{year}</option>
               ))}
             </select>
+          </div>
+          <div className="my-10">
+            {sortedDates.map((date) => (
+              <div key={date}>
+                <h3 className="text-xl font-bold tracking-wide my-3">
+                  {formatDate(date)}
+                </h3>
+                <ul>
+                  {groupedTransactions[date].map((transaction) => (
+                    <li key={transaction.id}>{transaction.title}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       </div>
