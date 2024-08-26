@@ -20,6 +20,8 @@ export default function TransactionPage() {
   ];
 
   const [isPending, startTransition] = useTransition();
+  const [month, setMonth] = useState();
+  const [year, setYear] = useState(new Date().getFullYear());
 
   const currentYear = new Date().getFullYear();
   const yearsArray = Array.from(
@@ -70,8 +72,8 @@ export default function TransactionPage() {
                 <span>|</span>
               </div>
             </div>
-            <select className="select select-bordered w-full max-w-xs">
-              <option disabled selected>
+            <select className="select select-bordered font-semibold w-full max-w-xs">
+              <option disabled value={year}>
                 Select a year
               </option>
               {yearsArray.map((year, key) => (

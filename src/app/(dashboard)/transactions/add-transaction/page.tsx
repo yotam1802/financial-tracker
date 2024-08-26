@@ -341,8 +341,8 @@ export default function TransactionPage() {
                 type="date"
                 className="grow overflow-hidden"
                 placeholder="Select date"
-                min={"2024-01-01"}
-                max={`${new Date().getFullYear() + 4}-12-31`}
+                min={`${new Date().getFullYear() - 9}-12-31`}
+                max={`${new Date().getFullYear()}-12-31`}
                 value={date}
                 onChange={handleDateChange}
                 required
