@@ -25,6 +25,7 @@ export async function getTransactions(year: string, month: string) {
         gte: startDate, // Greater than or equal to the start date
         lte: endDate, // Less than or equal to the end date
       },
+      userId: session.user.id,
     },
     include: {
       category: true, // Include the category details in the result

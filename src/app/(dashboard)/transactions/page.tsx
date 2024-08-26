@@ -156,10 +156,7 @@ export default function TransactionPage() {
                     >
                       <div className="flex items-center">
                         <div
-                          className="text-3xl mr-4 flex items-center justify-center w-12 h-12 rounded-full"
-                          style={{
-                            backgroundColor: transaction.category.bgColor,
-                          }}
+                          className={`text-3xl mr-4 flex items-center justify-center w-12 h-12 rounded-full ${transaction.category.bgColor}`}
                         >
                           {transaction.category.icon}
                         </div>
@@ -187,7 +184,7 @@ export default function TransactionPage() {
                           ${transaction.amount}
                         </p>
                         <span
-                          className={`mt-2 px-3 py-1 rounded-full text-xs font-medium ${transaction.category.badgeColor} text-gray-800`}
+                          className={`mt-2 px-3 py-1 rounded-full text-xs font-semibold ${transaction.category.badgeColor} text-gray-800`}
                         >
                           {transaction.category.name}
                         </span>
