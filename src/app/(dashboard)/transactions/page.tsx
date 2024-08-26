@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { getTransactions, removeTransaction } from "./actions";
 import emptySVG from "../../../../public/empty.svg";
+import transactionSVG from "../../../../public/transaction.svg";
 import Image from "next/image";
 
 interface Category {
@@ -101,6 +102,30 @@ export default function TransactionPage() {
         <div className="flex w-full flex-col">
           <div className="divider my-0"></div>
         </div>
+        <div className="hero">
+          <div className="hero-content flex-col lg:flex-row">
+            <Image
+              src={transactionSVG}
+              alt="Transaction Image"
+              width={1000}
+              height={1000}
+              className="max-w-[16rem]"
+            />
+            <div>
+              <h1 className="text-4xl font-bold">
+                {months[Number(month) - 1]}, {year}
+              </h1>
+              <p className="py-6">
+                View and manage all your transactions for the selected month and
+                year. Easily track your income and expenses, categorize
+                transactions, and stay on top of your financial health.
+              </p>
+              <Link className="btn btn-primary text-white" href={"#content"}>
+                View Transactions
+              </Link>
+            </div>
+          </div>
+        </div>
         <div className="w-full">
           <div className="flex flex-col lg:flex-row gap-10">
             <div className="w-full">
@@ -139,7 +164,7 @@ export default function TransactionPage() {
               ))}
             </select>
           </div>
-          <div className="my-10">
+          <div className="my-10" id="content">
             {transactions.length !== 0 ? (
               sortedDates.map((date) => (
                 <div key={date}>
@@ -222,7 +247,7 @@ export default function TransactionPage() {
                   className="max-w-[13rem] md:max-w-[16rem]"
                 />
                 <p className="font-semibold text-xs md:text-sm">
-                  No transactions found for {months[Number(month)]}, {year}.
+                  No transactions found for {months[Number(month) - 1]}, {year}.
                 </p>
               </div>
             )}
