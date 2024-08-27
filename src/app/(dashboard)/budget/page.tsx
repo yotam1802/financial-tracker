@@ -1,10 +1,31 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { getMonthlyFinancials } from "./actions";
 
 export default function BudgetPage() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [financials, setFinancials] = useState({
+    totalIncome: 0,
+    totalExpenses: 0,
+  });
+
+  useEffect(() => {
+    const currentDate = new Date();
+    const fetchFinancials = async () => {
+      setIsLoading(true);
+      const monthlyFinancials = await getMonthlyFinancials(
+        currentDate.getFullYear().toString(),
+        (currentDate.getMonth() + 1).toString()
+      );
+      setFinancials(monthlyFinancials);
+      setIsLoading(false);
+    };
+
+    fetchFinancials();
+  }, []);
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -26,18 +47,27 @@ export default function BudgetPage() {
               height={1000}
               className="w-[20rem]"
             />
-            <div className="mx-5">
+            <div className="mx-5 mt-2">
               <h1 className="text-4xl font-bold">Your Monthly Budget</h1>
               <p className="py-6">
                 Manage your finances effortlessly. Track your spending, analyze
                 your income, and optimize your budget to reach your financial
                 goals.
               </p>
-              <button className="btn btn-primary text-white">
+              <Link
+                className="btn btn-primary text-white"
+                href={"/transactions"}
+              >
                 View Details
-              </button>
+              </Link>
             </div>
           </div>
+        </div>
+        {
+          // monthly spending, income and chartjs info
+        }
+        <div>
+          {financials.totalIncome}, {financials.totalExpenses}
         </div>
       </div>
     </div>
