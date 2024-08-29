@@ -73,7 +73,7 @@ const months = [
 // Function to map Tailwind class names to hex colors
 const tailwindColorMap = (tailwindClass: string) => {
   const colorMap: { [key: string]: string } = {
-    "bg-primary-content": "#ffffff", // Assuming primary content is white
+    "bg-primary-content": "#cee4ff",
     "bg-violet-500": "#8b5cf6",
     "bg-violet-300": "#c4b5fd",
     "bg-indigo-500": "#6366f1",
@@ -423,7 +423,12 @@ export default function BudgetPage() {
             <h2 className="text-lg font-bold text-gray-700 mb-4">
               Net Cashflow Per Day
             </h2>
-            <Bar data={netCashflowData} options={barChartOptions} />
+            <div className="h-64 md:h-80 xl:h-96">
+              <Bar
+                data={netCashflowData}
+                options={{ ...barChartOptions, maintainAspectRatio: false }}
+              />
+            </div>
           </div>
 
           {/* Expenses based on category*/}
@@ -431,7 +436,12 @@ export default function BudgetPage() {
             <h2 className="text-lg font-bold text-gray-700 mb-4">
               Monthly Expenses By Category
             </h2>
-            <Pie data={expensesByCategoryData} options={pieChartOptions} />
+            <div className="h-64 md:h-80 xl:h-96">
+              <Pie
+                data={expensesByCategoryData}
+                options={{ ...pieChartOptions, maintainAspectRatio: false }}
+              />
+            </div>
           </div>
         </div>
       </div>
