@@ -4,6 +4,25 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getMonthlyFinancials } from "./actions";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  ArcElement, // This is needed for the Pie chart
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Pie } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default function BudgetPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +45,22 @@ export default function BudgetPage() {
 
     fetchFinancials();
   }, []);
+
+  const chartData = {
+    labels: ["Income", "Expenses", "Remaining"],
+    datasets: [
+      {
+        label: "Amount in $",
+        data: [
+          financials.totalIncome,
+          financials.totalExpenses,
+          financials.totalIncome - financials.totalExpenses,
+        ],
+        backgroundColor: ["#4CAF50", "#F44336", "#FFEB3B"],
+        hoverOffset: 4, // Adds spacing on hover
+      },
+    ],
+  };
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -66,8 +101,40 @@ export default function BudgetPage() {
         {
           // monthly spending, income and chartjs info
         }
-        <div>
-          {financials.totalIncome}, {financials.totalExpenses}
+        <div className="flex flex-col lg:flex-row w-full mt-10">
+          {/* Left Side: Income, Expenses, Remaining Budget */}
+          <div className="flex flex-col justify-between w-full lg:w-1/2 bg-white shadow-md rounded-lg p-6">
+            <div className="mb-4">
+              <h2 className="text-lg font-bold text-gray-700">Total Income</h2>
+              <p className="text-xl font-semibold text-green-600">
+                ${financials.totalIncome}
+              </p>
+            </div>
+            <div className="mb-4">
+              <h2 className="text-lg font-bold text-gray-700">
+                Total Expenses
+              </h2>
+              <p className="text-xl font-semibold text-red-600">
+                ${financials.totalExpenses}
+              </p>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-700">
+                Remaining Budget
+              </h2>
+              <p className="text-xl font-semibold text-yellow-600">
+                ${financials.totalIncome - financials.totalExpenses}
+              </p>
+            </div>
+          </div>
+
+          {/* Right Side: Chart.js Information */}
+          <div className="w-full lg:w-1/2 mt-10 lg:mt-0 lg:ml-10 bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-lg font-bold text-gray-700 mb-4">
+              Budget Breakdown
+            </h2>
+            <Pie data={chartData} />
+          </div>
         </div>
       </div>
     </div>
