@@ -19,39 +19,28 @@ export async function getMonthlyFinancials(year: string, month: string) {
   const startDate = `${year}-${month.padStart(2, "0")}-01`;
   const endDate = `${year}-${month.padStart(2, "0")}-31`;
 
-  // Fetch income transactions
-  const incomeTransactions = await prisma.transaction.findMany({
+  // Fetch all transactions for the month
+  const transactions = await prisma.transaction.findMany({
     where: {
       date: {
         gte: startDate,
         lte: endDate,
       },
       userId: session.user.id,
-      transactionType: "income",
     },
-  });
-
-  // Fetch expense transactions
-  const expenseTransactions = await prisma.transaction.findMany({
-    where: {
-      date: {
-        gte: startDate,
-        lte: endDate,
-      },
-      userId: session.user.id,
-      transactionType: "expense",
+    include: {
+      category: true, // Include the category details in the result
     },
   });
 
   // Calculate total income and expenses
-  const totalIncome = incomeTransactions.reduce(
-    (sum, transaction) => sum + Number(transaction.amount),
-    0
-  );
-  const totalExpenses = expenseTransactions.reduce(
-    (sum, transaction) => sum + Number(transaction.amount),
-    0
-  );
+  const totalIncome = transactions
+    .filter((transaction) => transaction.transactionType === "income")
+    .reduce((sum, transaction) => sum + Number(transaction.amount), 0);
 
-  return { totalIncome, totalExpenses };
+  const totalExpenses = transactions
+    .filter((transaction) => transaction.transactionType === "expense")
+    .reduce((sum, transaction) => sum + Number(transaction.amount), 0);
+
+  return { totalIncome, totalExpenses, transactions };
 }

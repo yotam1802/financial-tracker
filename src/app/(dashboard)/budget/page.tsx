@@ -4,31 +4,40 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getMonthlyFinancials } from "./actions";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  ArcElement, // This is needed for the Pie chart
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Pie } from "react-chartjs-2";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend
-);
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  bgColor: string;
+  badgeColor: string;
+  userId?: string | null;
+}
+
+interface Transaction {
+  id: string;
+  transactionType: string;
+  categoryId: string;
+  category: Category;
+  amount: string;
+  title: string;
+  date: string;
+  description: string;
+  userId?: string | null;
+}
+
+interface Financials {
+  totalIncome: number;
+  totalExpenses: number;
+  transactions: Transaction[];
+}
 
 export default function BudgetPage() {
   const [isLoading, setIsLoading] = useState(true);
-  const [financials, setFinancials] = useState({
+  const [financials, setFinancials] = useState<Financials>({
     totalIncome: 0,
     totalExpenses: 0,
+    transactions: [],
   });
 
   useEffect(() => {
@@ -101,39 +110,41 @@ export default function BudgetPage() {
         {
           // monthly spending, income and chartjs info
         }
-        <div className="flex flex-col lg:flex-row w-full mt-10">
-          {/* Left Side: Income, Expenses, Remaining Budget */}
-          <div className="flex flex-col justify-between w-full lg:w-1/2 bg-white shadow-md rounded-lg p-6">
-            <div className="mb-4">
-              <h2 className="text-lg font-bold text-gray-700">Total Income</h2>
-              <p className="text-xl font-semibold text-green-600">
-                ${financials.totalIncome}
-              </p>
-            </div>
-            <div className="mb-4">
-              <h2 className="text-lg font-bold text-gray-700">
-                Total Expenses
-              </h2>
-              <p className="text-xl font-semibold text-red-600">
-                ${financials.totalExpenses}
-              </p>
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-gray-700">
-                Remaining Budget
-              </h2>
-              <p className="text-xl font-semibold text-yellow-600">
-                ${financials.totalIncome - financials.totalExpenses}
-              </p>
-            </div>
+        <div className="flex flex-row w-full mt-5 justify-center gap-x-10">
+          <div>
+            <h2 className="text-lg font-bold text-gray-700">Total Income</h2>
+            <p className="text-xl font-semibold text-green-600">
+              ${financials.totalIncome}
+            </p>
           </div>
-
-          {/* Right Side: Chart.js Information */}
+          <div>
+            <h2 className="text-lg font-bold text-gray-700">Total Expenses</h2>
+            <p className="text-xl font-semibold text-red-600">
+              ${financials.totalExpenses}
+            </p>
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-gray-700">
+              Remaining Budget
+            </h2>
+            <p className="text-xl font-semibold text-yellow-600">
+              ${financials.totalIncome - financials.totalExpenses}
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-col lg:flex-row w-full mt-10">
+          {/* Cashflow during the month */}
           <div className="w-full lg:w-1/2 mt-10 lg:mt-0 lg:ml-10 bg-white shadow-md rounded-lg p-6">
             <h2 className="text-lg font-bold text-gray-700 mb-4">
               Budget Breakdown
             </h2>
-            <Pie data={chartData} />
+          </div>
+
+          {/* Expenses based on category*/}
+          <div className="w-full lg:w-1/2 mt-10 lg:mt-0 lg:ml-10 bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-lg font-bold text-gray-700 mb-4">
+              Budget Breakdown
+            </h2>
           </div>
         </div>
       </div>

@@ -329,7 +329,7 @@ export default function TransactionPage() {
           </div>
           {transactions.length !== 0 ? (
             <button
-              className="btn btn-primary text-white w-44 md:btn-wide btn-md"
+              className="btn btn-primary text-white w-44 md:btn-wide btn-md ml-1"
               type="submit"
               disabled={isPending}
               onClick={exportToExcel}
