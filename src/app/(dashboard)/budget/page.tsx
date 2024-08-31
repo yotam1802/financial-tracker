@@ -339,7 +339,9 @@ export default function BudgetPage() {
                 </svg>
               </div>
               <div className="stat-title">Income</div>
-              <div className="stat-value">${financials.totalIncome}</div>
+              <div className="stat-value">
+                ${financials.totalIncome.toFixed(2)}
+              </div>
               <div className="stat-desc">
                 Period: {months[new Date().getMonth()]}
               </div>
@@ -362,7 +364,9 @@ export default function BudgetPage() {
                 </svg>
               </div>
               <div className="stat-title">Expenses</div>
-              <div className="stat-value">${financials.totalExpenses}</div>
+              <div className="stat-value">
+                ${financials.totalExpenses.toFixed(2)}
+              </div>
               <div className="stat-desc">
                 Last Updated:{" "}
                 {(new Date().getMonth() + 1).toString().padStart(2, "0")}/
@@ -393,7 +397,8 @@ export default function BudgetPage() {
               </div>
               <div className="stat-title">Remaining Budget</div>
               <div className="stat-value">
-                ${financials.totalIncome - financials.totalExpenses}
+                $
+                {(financials.totalIncome - financials.totalExpenses).toFixed(2)}
               </div>
               <div className="stat-desc">
                 Total Transactions: {financials.transactions.length}

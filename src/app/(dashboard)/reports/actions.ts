@@ -5,34 +5,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 
-// Define the types based on the Prisma schema
-type Transaction = {
-  id: string;
-  transactionType: string;
-  categoryId: string;
-  category: Category;
-  amount: string;
-  title: string;
-  date: string;
-  description: string;
-  userId?: string | null;
-};
-
-type Category = {
-  id: string;
-  name: string;
-  icon: string;
-  bgColor: string;
-  badgeColor: string;
-  userId?: string | null;
-};
-
-type MonthlyFinancials = {
-  totalIncome: number;
-  totalExpenses: number;
-  transactions: Transaction[];
-};
-
 // Helper function to get the first and last day of a given month and year
 function getMonthRange(
   year: string,
@@ -44,9 +16,7 @@ function getMonthRange(
 }
 
 // Function to get the financials for each month of a given year
-export async function getYearlyFinancials(
-  year: string
-): Promise<MonthlyFinancials[]> {
+export async function getMonthlyFinancials(year: string) {
   "use server";
 
   // Retrieve the session
@@ -58,14 +28,14 @@ export async function getYearlyFinancials(
   }
 
   // Initialize array to store results for each month
-  const monthlyFinancials: MonthlyFinancials[] = [];
+  const monthlyFinancials = [];
 
   // Loop through each month (1 to 12)
   for (let month = 1; month <= 12; month++) {
     const { startDate, endDate } = getMonthRange(year, month);
 
     // Fetch all transactions for the current month
-    const transactions: Transaction[] = await prisma.transaction.findMany({
+    const transactions = await prisma.transaction.findMany({
       where: {
         date: {
           gte: startDate,
@@ -74,11 +44,10 @@ export async function getYearlyFinancials(
         userId: session.user.id,
       },
       include: {
-        category: true, // Include the category details in the result
+        category: true,
       },
     });
 
-    // Calculate total income and expenses for the current month
     const totalIncome = transactions
       .filter((transaction) => transaction.transactionType === "income")
       .reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);

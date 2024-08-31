@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getYearlyFinancials } from "./actions";
+import { getMonthlyFinancials } from "./actions";
 import { Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -53,21 +53,6 @@ type Financials = {
   transactions: Transaction[];
 };
 
-const months = [
-  "Jan 1st - Jan 31st",
-  "Feb 1st - Feb 28th",
-  "Mar 1st - Mar 31st",
-  "Apr 1st - Apr 30th",
-  "May 1st - May 31st",
-  "Jun 1st - Jun 30th",
-  "Jul 1st - Jul 31st",
-  "Aug 1st - Aug 31st",
-  "Sept 1st - Sept 30th",
-  "Oct 1st - Oct 31st",
-  "Nov 1st - Nov 30th",
-  "Dec 1st - Dec 31st",
-];
-
 // Function to map Tailwind class names to hex colors
 const tailwindColorMap = (tailwindClass: string) => {
   const colorMap: { [key: string]: string } = {
@@ -107,19 +92,24 @@ const tailwindColorMap = (tailwindClass: string) => {
 
 export default function ReportPage() {
   const [isLoading, setIsLoading] = useState(true);
-  const [financials, setFinancials] = useState<Financials[]>(
+  const [financials, setFinancials] = useState<Financials[]>( // Financials for each month in the year
     Array.from({ length: 12 }, () => ({
       totalIncome: 0,
       totalExpenses: 0,
       transactions: [],
     }))
   );
+  const [yearlyFinancials, setYearlyFinancials] = useState<Financials>({
+    totalIncome: 0,
+    totalExpenses: 0,
+    transactions: [],
+  });
 
   useEffect(() => {
     const currentDate = new Date();
     const fetchFinancials = async () => {
       setIsLoading(true);
-      const yearlyFinancials = await getYearlyFinancials(
+      const yearlyFinancials = await getMonthlyFinancials(
         currentDate.getFullYear().toString()
       );
       setFinancials(yearlyFinancials);
@@ -128,6 +118,19 @@ export default function ReportPage() {
 
     fetchFinancials();
   }, []);
+
+  useEffect(() => {
+    const yearlyTransactions = financials.reduce(
+      (acc, month) => {
+        acc.totalIncome += month.totalIncome;
+        acc.totalExpenses += month.totalExpenses;
+        acc.transactions = acc.transactions.concat(month.transactions);
+        return acc;
+      },
+      { totalIncome: 0, totalExpenses: 0, transactions: [] }
+    );
+    setYearlyFinancials(yearlyTransactions);
+  }, [financials]);
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -143,8 +146,8 @@ export default function ReportPage() {
         <div className="hero md:hidden xl:block">
           <div className="hero-content flex-col xl:flex-row">
             <Image
-              src={"/budget.svg"}
-              alt="Budget Hero Image"
+              src={"/reports.svg"}
+              alt="Reports Hero Image"
               width={1000}
               height={1000}
               className="w-[20rem]"
@@ -166,7 +169,7 @@ export default function ReportPage() {
           </div>
         </div>
         {
-          // monthly spending, income and chartjs info
+          // yearly spending, income and chartjs info
         }
         <div className="flex items-center justify-center md:justify-start gap-x-7">
           <div className="stats stats-vertical xl:stats-horizontal shadow min-w-fit">
@@ -187,10 +190,12 @@ export default function ReportPage() {
                   <path d="M2.25 18a.75.75 0 0 0 0 1.5c5.4 0 10.63.722 15.6 2.075 1.19.324 2.4-.558 2.4-1.82V18.75a.75.75 0 0 0-.75-.75H2.25Z" />
                 </svg>
               </div>
-              <div className="stat-title">Income</div>
-              <div className="stat-value">${financials[7]?.totalIncome}</div>
+              <div className="stat-title">Yearly Income</div>
+              <div className="stat-value">
+                ${yearlyFinancials.totalIncome.toFixed(2)}
+              </div>
               <div className="stat-desc">
-                Period: {months[new Date().getMonth()]}
+                Period: {new Date().getFullYear()}
               </div>
             </div>
 
@@ -210,8 +215,10 @@ export default function ReportPage() {
                   />
                 </svg>
               </div>
-              <div className="stat-title">Expenses</div>
-              <div className="stat-value">${financials[7]?.totalExpenses}</div>
+              <div className="stat-title">Yearly Expenses</div>
+              <div className="stat-value">
+                ${yearlyFinancials.totalExpenses.toFixed(2)}
+              </div>
               <div className="stat-desc">
                 Last Updated:{" "}
                 {(new Date().getMonth() + 1).toString().padStart(2, "0")}/
@@ -242,25 +249,28 @@ export default function ReportPage() {
               </div>
               <div className="stat-title">Remaining Budget</div>
               <div className="stat-value">
-                ${financials[7]?.totalIncome - financials[7]?.totalExpenses}
+                $
+                {(
+                  yearlyFinancials.totalIncome - yearlyFinancials.totalExpenses
+                ).toFixed(2)}
               </div>
               <div className="stat-desc">
-                Total Transactions: {financials[7]?.transactions.length}
+                Total Transactions: {yearlyFinancials.transactions.length}
               </div>
             </div>
           </div>
           <div className="flex-col gap-y-5 mb-0 hidden md:flex xl:hidden">
             <Image
-              src={"/budget.svg"}
-              alt="Budget Hero Image"
+              src={"/reports.svg"}
+              alt="Reports Hero Image"
               width={1000}
               height={1000}
               className="w-[14rem]"
             />
             <p>
-              Manage your finances effortlessly. Track your spending, analyze
-              your income, and optimize your budget to reach your financial
-              goals.
+              Gain insights into your financial performance with detailed
+              reports. Analyze trends, track income and expenses by month, and
+              evaluate your financial health over time.
             </p>
           </div>
         </div>
