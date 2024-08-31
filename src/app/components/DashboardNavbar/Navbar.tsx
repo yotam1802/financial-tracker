@@ -27,16 +27,21 @@ export default async function Navbar() {
           <NavbarMenu />
         </div>
       </div>
-      <div className="gap-5 text-lg font-bold hidden lg:flex items-center justify-center mb-3">
-        <Image
-          src={user?.image || profilePicPlaceholder}
-          alt="Profile Picture"
-          width={1000}
-          height={1000}
-          className="w-[3.2rem]
+      <div className="hidden lg:block">
+        <div className="gap-5 text-lg font-bold hidden lg:flex items-center justify-center mb-3">
+          <Image
+            src={user?.image || profilePicPlaceholder}
+            alt="Profile Picture"
+            width={1000}
+            height={1000}
+            className="w-[3.2rem]
            rounded-full"
-        />
-        <SignoutButton />
+          />
+          <SignoutButton />
+        </div>
+        <div className="flex justify-center items-center text-sm font-normal">
+          Copyright © 2024 Polaris
+        </div>
       </div>
     </div>
   );
