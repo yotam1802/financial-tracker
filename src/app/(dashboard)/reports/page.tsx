@@ -132,10 +132,16 @@ export default function ReportPage() {
     setYearlyFinancials(yearlyTransactions);
   }, [financials]);
 
-  // Prepare data for the line chart
+  // Prepare data for line graphs
   const monthlyNetCashFlow = financials.map(
     (month) => month.totalIncome - month.totalExpenses
   );
+
+  const monthlyIncome = financials.map((month) => month.totalIncome);
+
+  const monthlyExpenses = financials.map((month) => month.totalExpenses);
+
+  // Labels to display months
   const monthlyLabels = financials.map((_, index) =>
     new Date(0, index).toLocaleString("default", { month: "short" })
   );
@@ -146,8 +152,34 @@ export default function ReportPage() {
       {
         label: "Net Cashflow",
         data: monthlyNetCashFlow,
-        borderColor: "#3b82f6", // Change color if needed
-        backgroundColor: "rgba(59, 130, 246, 0.2)", // Change color if needed
+        borderColor: "#3b82f6",
+        backgroundColor: "rgba(59, 130, 246, 0.2)",
+        fill: true,
+      },
+    ],
+  };
+
+  const incomeData = {
+    labels: monthlyLabels,
+    datasets: [
+      {
+        label: "Monthly Income",
+        data: monthlyIncome,
+        borderColor: "#10b981",
+        backgroundColor: "rgba(16, 185, 129, 0.2)",
+        fill: true,
+      },
+    ],
+  };
+
+  const expensesData = {
+    labels: monthlyLabels,
+    datasets: [
+      {
+        label: "Monthly Expenses",
+        data: monthlyExpenses,
+        borderColor: "#ef4444",
+        backgroundColor: "rgba(239, 68, 68, 0.2)",
         fill: true,
       },
     ],
@@ -207,13 +239,13 @@ export default function ReportPage() {
       const amount = parseFloat(transaction.amount);
 
       if (!categoryMap[categoryName]) {
-        // Initialize if category is not yet in the map
+        // Initialize if category doesn't exist
         categoryMap[categoryName] = {
           totalAmount: amount,
           bgColor: tailwindColorMap(transaction.category.bgColor),
         };
       } else {
-        // Sum amounts if category already exists in the map
+        // Sum amounts if category already exists
         categoryMap[categoryName].totalAmount += amount;
       }
     });
@@ -226,7 +258,6 @@ export default function ReportPage() {
     (t) => t.transactionType === "expense"
   );
 
-  // Group transactions by category
   const groupedExpenses = groupTransactionsByCategory(expenseTransactions);
 
   // Prepare data for the pie chart
@@ -260,35 +291,6 @@ export default function ReportPage() {
         },
       },
     },
-  };
-
-  const monthlyIncome = financials.map((month) => month.totalIncome);
-  const monthlyExpenses = financials.map((month) => month.totalExpenses);
-
-  const incomeData = {
-    labels: monthlyLabels,
-    datasets: [
-      {
-        label: "Monthly Income",
-        data: monthlyIncome,
-        borderColor: "#10b981", // Customize color
-        backgroundColor: "rgba(16, 185, 129, 0.2)", // Customize color
-        fill: true,
-      },
-    ],
-  };
-
-  const expensesData = {
-    labels: monthlyLabels,
-    datasets: [
-      {
-        label: "Monthly Expenses",
-        data: monthlyExpenses,
-        borderColor: "#ef4444", // Customize color
-        backgroundColor: "rgba(239, 68, 68, 0.2)", // Customize color
-        fill: true,
-      },
-    ],
   };
 
   return (
