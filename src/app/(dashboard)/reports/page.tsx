@@ -466,7 +466,7 @@ export default function ReportPage() {
           {/* Income each month */}
           <div className="w-full xl:w-1/2 mt-5 xl:mt-0 bg-white shadow-md rounded-lg p-6">
             <h2 className="text-lg font-bold text-gray-700 mb-4">
-              Income Each Month
+              Income Per Month
             </h2>
             <div className="h-64 md:h-80 xl:h-96">
               <Line
@@ -479,7 +479,7 @@ export default function ReportPage() {
           {/* Expenses each month*/}
           <div className="w-full xl:w-1/2 mt-5 xl:mt-0 bg-white shadow-md rounded-lg p-6">
             <h2 className="text-lg font-bold text-gray-700 mb-4">
-              Expenses Each Month
+              Expenses Per Month
             </h2>
             <div className="h-64 md:h-80 xl:h-96">
               <Line
