@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getMonthlyFinancials } from "./actions";
-import { Bar, Pie } from "react-chartjs-2";
+import { Line, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -12,18 +12,18 @@ import {
   Legend,
   CategoryScale,
   LinearScale,
-  BarElement,
-  TimeScale,
+  LineElement,
+  PointElement,
 } from "chart.js";
 
 ChartJS.register(
+  LineElement,
+  PointElement,
   ArcElement,
   Tooltip,
   Legend,
   CategoryScale,
-  LinearScale,
-  BarElement,
-  TimeScale
+  LinearScale
 );
 
 interface Category {
@@ -131,6 +131,165 @@ export default function ReportPage() {
     );
     setYearlyFinancials(yearlyTransactions);
   }, [financials]);
+
+  // Prepare data for the line chart
+  const monthlyNetCashFlow = financials.map(
+    (month) => month.totalIncome - month.totalExpenses
+  );
+  const monthlyLabels = financials.map((_, index) =>
+    new Date(0, index).toLocaleString("default", { month: "short" })
+  );
+
+  const netCashFlowData = {
+    labels: monthlyLabels,
+    datasets: [
+      {
+        label: "Net Cashflow",
+        data: monthlyNetCashFlow,
+        borderColor: "#3b82f6", // Change color if needed
+        backgroundColor: "rgba(59, 130, 246, 0.2)", // Change color if needed
+        fill: true,
+      },
+    ],
+  };
+
+  const lineChartOptions = {
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Month",
+          font: {
+            weight: "bold" as any,
+          },
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Amount",
+          font: {
+            weight: "bold" as any,
+          },
+        },
+        ticks: {
+          callback: (value: number | string) => {
+            const numValue = Number(value);
+            return numValue < 0
+              ? `-$${Math.abs(numValue).toFixed(2)}`
+              : `$${numValue.toFixed(2)}`;
+          },
+        },
+      },
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const value = context.raw;
+            return value < 0
+              ? `-$${Math.abs(value).toFixed(2)}`
+              : `$${value.toFixed(2)}`;
+          },
+        },
+      },
+    },
+  };
+
+  // Function to group transactions by category and sum their amounts
+  const groupTransactionsByCategory = (transactions: Transaction[]) => {
+    const categoryMap: {
+      [key: string]: { totalAmount: number; bgColor: string };
+    } = {};
+
+    transactions.forEach((transaction) => {
+      const categoryName = transaction.category.name;
+      const amount = parseFloat(transaction.amount);
+
+      if (!categoryMap[categoryName]) {
+        // Initialize if category is not yet in the map
+        categoryMap[categoryName] = {
+          totalAmount: amount,
+          bgColor: tailwindColorMap(transaction.category.bgColor),
+        };
+      } else {
+        // Sum amounts if category already exists in the map
+        categoryMap[categoryName].totalAmount += amount;
+      }
+    });
+
+    return categoryMap;
+  };
+
+  // Filter out only the expense transactions
+  const expenseTransactions = yearlyFinancials.transactions.filter(
+    (t) => t.transactionType === "expense"
+  );
+
+  // Group transactions by category
+  const groupedExpenses = groupTransactionsByCategory(expenseTransactions);
+
+  // Prepare data for the pie chart
+  const expenseCategories = Object.keys(groupedExpenses);
+  const expenseAmounts = Object.values(groupedExpenses).map(
+    (group) => group.totalAmount
+  );
+  const expenseBackgroundColors = Object.values(groupedExpenses).map(
+    (group) => group.bgColor
+  );
+
+  const expensesByCategoryData = {
+    labels: expenseCategories,
+    datasets: [
+      {
+        label: "Expenses",
+        data: expenseAmounts,
+        backgroundColor: expenseBackgroundColors,
+      },
+    ],
+  };
+
+  const pieChartOptions = {
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const value = context.raw as number;
+            return `Expenses: $${value.toFixed(2)}`; // Adding $ sign
+          },
+        },
+      },
+    },
+  };
+
+  const monthlyIncome = financials.map((month) => month.totalIncome);
+  const monthlyExpenses = financials.map((month) => month.totalExpenses);
+
+  const incomeData = {
+    labels: monthlyLabels,
+    datasets: [
+      {
+        label: "Monthly Income",
+        data: monthlyIncome,
+        borderColor: "#10b981", // Customize color
+        backgroundColor: "rgba(16, 185, 129, 0.2)", // Customize color
+        fill: true,
+      },
+    ],
+  };
+
+  const expensesData = {
+    labels: monthlyLabels,
+    datasets: [
+      {
+        label: "Monthly Expenses",
+        data: monthlyExpenses,
+        borderColor: "#ef4444", // Customize color
+        backgroundColor: "rgba(239, 68, 68, 0.2)", // Customize color
+        fill: true,
+      },
+    ],
+  };
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -272,6 +431,60 @@ export default function ReportPage() {
               reports. Analyze trends, track income and expenses by month, and
               evaluate your financial health over time.
             </p>
+          </div>
+        </div>
+        <div className="flex flex-col xl:flex-row w-full xl:mt-5 justify-center gap-x-5">
+          {/* Cashflow each month */}
+          <div className="w-full xl:w-1/2 mt-5 xl:mt-0 bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-lg font-bold text-gray-700 mb-4">
+              Net Cashflow Per Month
+            </h2>
+            <div className="h-64 md:h-80 xl:h-96">
+              <Line
+                data={netCashFlowData}
+                options={{ ...lineChartOptions, maintainAspectRatio: false }}
+              />
+            </div>
+          </div>
+
+          {/* Expenses based on category*/}
+          <div className="w-full xl:w-1/2 mt-5 xl:mt-0 bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-lg font-bold text-gray-700 mb-4">
+              Yearly Expenses By Category
+            </h2>
+            <div className="h-64 md:h-80 xl:h-96">
+              <Pie
+                data={expensesByCategoryData}
+                options={{ ...pieChartOptions, maintainAspectRatio: false }}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col xl:flex-row w-full xl:mt-5 justify-center gap-x-5">
+          {/* Income each month */}
+          <div className="w-full xl:w-1/2 mt-5 xl:mt-0 bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-lg font-bold text-gray-700 mb-4">
+              Income Each Month
+            </h2>
+            <div className="h-64 md:h-80 xl:h-96">
+              <Line
+                data={incomeData}
+                options={{ ...lineChartOptions, maintainAspectRatio: false }}
+              />
+            </div>
+          </div>
+
+          {/* Expenses each month*/}
+          <div className="w-full xl:w-1/2 mt-5 xl:mt-0 bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-lg font-bold text-gray-700 mb-4">
+              Expenses Each Month
+            </h2>
+            <div className="h-64 md:h-80 xl:h-96">
+              <Line
+                data={expensesData}
+                options={{ ...lineChartOptions, maintainAspectRatio: false }}
+              />
+            </div>
           </div>
         </div>
       </div>
